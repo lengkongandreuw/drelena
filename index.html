@@ -53,61 +53,58 @@
         .animate-delay-200 { animation-delay: 200ms; }
     </style>
 </head>
-<body class="bg-base text-dark font-sans selection:bg-accent selection:text-white flex flex-col min-h-screen">
+<body class="bg-[#FAF9F6] text-dark font-sans selection:bg-accent selection:text-white flex flex-col min-h-screen overflow-x-hidden">
 
     <!-- --- HEADER --- -->
-    <header class="sticky top-0 z-50 bg-base/90 backdrop-blur-md border-b border-light transition-all duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-24">
+    <header class="absolute top-0 w-full z-50 transition-all duration-300 py-6">
+        <div class="max-w-[1400px] mx-auto px-6 lg:px-12">
+            <div class="flex justify-between items-center">
                 
                 <!-- Left Logo -->
-                <a href="#home" class="flex flex-col cursor-pointer">
-                    <span class="font-serif text-lg sm:text-2xl tracking-[0.1em] text-primary font-light leading-none">
+                <a href="#home" class="flex flex-col cursor-pointer z-50">
+                    <span class="font-serif text-lg sm:text-xl tracking-[0.05em] text-[#1a1a1a] font-semibold leading-none">
                         DR. ELENA MARIE VELLA
                     </span>
-                    <span class="text-[9px] tracking-[0.25em] text-accent uppercase font-semibold mt-1">
+                    <span class="text-[9px] tracking-[0.25em] text-dark/50 uppercase font-semibold mt-1">
                         Consultant Psychiatrist
                     </span>
                 </a>
 
                 <!-- Center Navigation -->
-                <nav class="hidden lg:flex space-x-8">
-                    <a href="#about" class="nav-link text-xs uppercase tracking-[0.2em] font-medium text-dark/80 hover:text-primary transition-colors duration-200 relative group">
+                <nav class="hidden lg:flex space-x-10">
+                    <a href="#about" class="nav-link text-[10px] uppercase tracking-[0.15em] font-bold text-[#1a1a1a] hover:text-accent transition-colors duration-200">
                         About
-                        <span class="absolute bottom-[-6px] left-0 right-0 h-[1.5px] bg-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
                     </a>
-                    <a href="#experience" class="nav-link text-xs uppercase tracking-[0.2em] font-medium text-dark/80 hover:text-primary transition-colors duration-200 relative group">
+                    <a href="#experience" class="nav-link text-[10px] uppercase tracking-[0.15em] font-bold text-[#1a1a1a] hover:text-accent transition-colors duration-200">
                         Experience
-                        <span class="absolute bottom-[-6px] left-0 right-0 h-[1.5px] bg-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
                     </a>
-                    <a href="#specializations" class="nav-link text-xs uppercase tracking-[0.2em] font-medium text-dark/80 hover:text-primary transition-colors duration-200 relative group">
+                    <a href="#specializations" class="nav-link text-[10px] uppercase tracking-[0.15em] font-bold text-[#1a1a1a] hover:text-accent transition-colors duration-200">
                         Specializations
-                        <span class="absolute bottom-[-6px] left-0 right-0 h-[1.5px] bg-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
                     </a>
-                    <a href="#research" class="nav-link text-xs uppercase tracking-[0.2em] font-medium text-dark/80 hover:text-primary transition-colors duration-200 relative group">
+                    <a href="#research" class="nav-link text-[10px] uppercase tracking-[0.15em] font-bold text-[#1a1a1a] hover:text-accent transition-colors duration-200">
                         Research
-                        <span class="absolute bottom-[-6px] left-0 right-0 h-[1.5px] bg-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
                     </a>
-                    <a href="#speaking" class="nav-link text-xs uppercase tracking-[0.2em] font-medium text-dark/80 hover:text-primary transition-colors duration-200 relative group">
+                    <a href="#speaking" class="nav-link text-[10px] uppercase tracking-[0.15em] font-bold text-[#1a1a1a] hover:text-accent transition-colors duration-200">
                         Speaking
-                        <span class="absolute bottom-[-6px] left-0 right-0 h-[1.5px] bg-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
                     </a>
-                    <a href="#contact" class="nav-link text-xs uppercase tracking-[0.2em] font-medium text-dark/80 hover:text-primary transition-colors duration-200 relative group">
+                    <a href="#contact" class="nav-link text-[10px] uppercase tracking-[0.15em] font-bold text-[#1a1a1a] hover:text-accent transition-colors duration-200">
                         Contact
-                        <span class="absolute bottom-[-6px] left-0 right-0 h-[1.5px] bg-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
                     </a>
                 </nav>
 
                 <!-- Right Action -->
-                <div class="hidden lg:flex items-center space-x-4">
-                    <button onclick="toggleBookingModal(true)" class="bg-primary text-white hover:bg-accent hover:text-primary px-6 py-3 text-xs tracking-widest uppercase font-bold transition-all duration-300 flex items-center gap-2 border border-transparent hover:border-primary">
-                        Book Consultation <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                <div class="hidden lg:flex items-center space-x-6 z-50">
+                    <button onclick="toggleBookingModal(true)" class="bg-[#1a1a1a] text-white hover:bg-accent px-8 py-3.5 text-[10px] tracking-widest uppercase font-bold transition-all duration-300">
+                        Book Consultation
+                    </button>
+                    <button class="text-[#1a1a1a] hover:text-accent transition-colors">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
                     </button>
                 </div>
 
                 <!-- Mobile Menu Trigger -->
-                <div class="lg:hidden flex items-center">
-                    <button id="mobile-menu-btn" class="p-2 text-primary hover:text-accent transition-colors">
+                <div class="lg:hidden flex items-center z-50">
+                    <button id="mobile-menu-btn" class="p-2 text-[#1a1a1a] hover:text-accent transition-colors">
                         <i data-lucide="menu" class="w-6 h-6"></i>
                     </button>
                 </div>
@@ -116,7 +113,7 @@
         </div>
 
         <!-- Mobile Navigation Drawer -->
-        <div id="mobile-menu" class="hidden lg:hidden bg-base border-b border-light px-4 pt-2 pb-6 space-y-1 shadow-lg absolute w-full">
+        <div id="mobile-menu" class="hidden lg:hidden bg-[#FAF9F6] border-b border-light px-4 pt-6 pb-6 space-y-1 shadow-lg absolute w-full top-full left-0 z-40">
             <a href="#about" class="mobile-nav-link block w-full text-left px-4 py-3.5 text-xs uppercase tracking-widest font-bold text-dark hover:bg-light transition-colors">About Dr. Elena</a>
             <a href="#experience" class="mobile-nav-link block w-full text-left px-4 py-3.5 text-xs uppercase tracking-widest font-bold text-dark hover:bg-light transition-colors">Career Journey</a>
             <a href="#specializations" class="mobile-nav-link block w-full text-left px-4 py-3.5 text-xs uppercase tracking-widest font-bold text-dark hover:bg-light transition-colors">Specializations</a>
@@ -124,7 +121,7 @@
             <a href="#speaking" class="mobile-nav-link block w-full text-left px-4 py-3.5 text-xs uppercase tracking-widest font-bold text-dark hover:bg-light transition-colors">Speaking & Media</a>
             <a href="#contact" class="mobile-nav-link block w-full text-left px-4 py-3.5 text-xs uppercase tracking-widest font-bold text-dark hover:bg-light transition-colors">Booking Portal</a>
             <div class="pt-4 px-4">
-                <button onclick="toggleBookingModal(true)" class="w-full text-center bg-accent text-primary py-3 text-xs font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all">
+                <button onclick="toggleBookingModal(true)" class="w-full text-center bg-[#1a1a1a] text-white py-4 text-xs font-bold uppercase tracking-widest hover:bg-accent transition-all">
                     Book Consultation
                 </button>
             </div>
@@ -134,70 +131,87 @@
     <main class="flex-grow">
         
         <!-- 1. HERO SECTION -->
-        <section id="home" class="relative overflow-hidden py-12 lg:py-20 border-b border-light bg-base pt-24 -mt-24">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <section id="home" class="relative min-h-screen pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-visible flex items-center">
+            
+            <!-- Organic Background Blob -->
+            <div class="absolute right-0 top-0 w-full lg:w-[55%] h-full bg-[#F4EFEA] rounded-l-[100px] lg:rounded-l-[250px] -z-10 opacity-70"></div>
+
+            <div class="max-w-[1400px] mx-auto px-6 lg:px-12 w-full">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
                     
-                    <!-- Left Column: Text & Credentials -->
-                    <div class="lg:col-span-6 space-y-8 animate-fadeInUp">
-                        <div class="flex items-center gap-3">
-                            <span class="w-8 h-[1px] bg-accent"></span>
-                            <p class="text-xs uppercase tracking-[0.25em] text-accent font-semibold">
-                                Understanding the story behind human resilience.
+                    <!-- Left Column: Typography & Text -->
+                    <div class="lg:col-span-6 relative z-20 animate-fadeInUp">
+                        
+                        <!-- Top minimal text -->
+                        <div class="flex items-center gap-4 text-dark/70 mb-8 sm:mb-12">
+                            <span class="w-12 h-[1px] bg-dark/30"></span>
+                            <p class="text-xs sm:text-sm font-medium tracking-wide">
+                                Understanding the stories<br />behind human resilience.
                             </p>
                         </div>
 
-                        <h1 class="font-serif text-5xl sm:text-7xl lg:text-8xl text-primary leading-none font-light tracking-tight">
-                            DR. ELENA VELLA
+                        <!-- Huge Typography -->
+                        <h1 class="font-serif text-[5.5rem] sm:text-[7rem] lg:text-[8.5rem] leading-[0.85] text-[#1a1a1a] font-medium tracking-tight mb-8 sm:mb-12">
+                            DR.<br />ELENA<br />VELLA
                         </h1>
                         
-                        <p class="text-xs tracking-[0.3em] text-accent uppercase font-bold">
-                            CONSULTANT PSYCHIATRIST
-                        </p>
+                        <!-- Subtitle -->
+                        <div class="flex items-center gap-4 mb-6 sm:mb-8">
+                            <span class="w-12 h-[1px] bg-[#1a1a1a]"></span>
+                            <p class="text-[10px] sm:text-xs tracking-[0.3em] text-[#1a1a1a] uppercase font-bold">
+                                CONSULTANT PSYCHIATRIST
+                            </p>
+                        </div>
                         
-                        <p class="text-dark/80 text-base max-w-md leading-relaxed font-light">
-                            Specializing in trauma recovery, anxiety disorders, burnout management, and adult mental health. Based in London with an integrative approach.
+                        <p class="text-dark/80 text-sm max-w-sm leading-relaxed font-light mb-10">
+                            Specialising in trauma recovery, anxiety disorders, burnout management, and adult mental health.
                         </p>
                         
                         <!-- Action Buttons -->
-                        <div class="flex flex-wrap gap-4 pt-4">
-                            <button onclick="toggleBookingModal(true)" class="bg-primary text-white hover:bg-accent hover:text-primary px-8 py-4 text-xs tracking-widest uppercase font-bold transition-all duration-300 flex items-center gap-3 shadow-md hover:-translate-y-0.5 transform">
-                                Book Consultation <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        <div class="flex flex-wrap items-center gap-6 sm:gap-8">
+                            <button onclick="toggleBookingModal(true)" class="bg-[#1a1a1a] text-white hover:bg-accent px-8 py-4 text-[10px] sm:text-xs tracking-widest uppercase font-bold transition-all duration-300 flex items-center gap-3">
+                                BOOK CONSULTATION <i data-lucide="arrow-right" class="w-4 h-4"></i>
                             </button>
                             
-                            <button onclick="toggleVideoModal(true)" class="flex items-center gap-3 text-xs uppercase tracking-widest font-bold text-primary hover:text-accent transition-colors group">
-                                <span class="w-10 h-10 rounded-full border border-primary/20 flex items-center justify-center group-hover:border-accent transition-colors">
-                                    <i data-lucide="play" class="w-3 h-3 fill-current ml-0.5"></i>
+                            <button onclick="toggleVideoModal(true)" class="flex items-center gap-3 text-[10px] sm:text-xs uppercase tracking-widest font-bold text-[#1a1a1a] hover:text-accent transition-colors group">
+                                <span class="w-12 h-12 rounded-full border border-[#1a1a1a]/20 flex items-center justify-center group-hover:border-accent transition-colors">
+                                    <i data-lucide="play" class="w-4 h-4 fill-current ml-0.5"></i>
                                 </span>
-                                Watch Intro
+                                WATCH INTRO
                             </button>
                         </div>
                     </div>
 
-                    <!-- Right Column: Elena's Photo & Floating Stats -->
-                    <div class="lg:col-span-6 relative animate-fadeIn animate-delay-100">
-                        <div class="relative mx-auto max-w-md lg:max-w-none">
-                            <div class="aspect-[4/5] bg-light relative overflow-hidden shadow-2xl">
-                                <img src="https://raw.githubusercontent.com/lengkongandreuw/drelena/main/heroimage1.png" alt="Dr. Elena Vella - Professional Portrait" class="absolute inset-0 w-full h-full object-cover object-center" />
-                            </div>
-                            <!-- Floating Stats Block -->
-                            <div class="bg-white p-6 sm:p-8 mt-6 border border-light shadow-lg grid grid-cols-2 sm:grid-cols-4 gap-6 relative z-20">
-                                <div class="space-y-1">
-                                    <p class="font-serif text-2xl text-primary font-light">12+</p>
-                                    <p class="text-[9px] text-dark/60 uppercase tracking-wider font-semibold leading-tight">Years Experience</p>
+                    <!-- Right Column: Image & Floating Stats Box -->
+                    <div class="lg:col-span-6 relative mt-16 lg:mt-0 animate-fadeIn animate-delay-200">
+                        <div class="relative w-full h-[500px] lg:h-[700px] flex items-end justify-center lg:justify-end">
+                            
+                            <!-- Dr Elena Main Image -->
+                            <img src="https://raw.githubusercontent.com/lengkongandreuw/drelena/main/heroimage1.png" alt="Dr. Elena Vella" class="absolute bottom-0 right-0 w-auto h-[90%] lg:h-[110%] object-contain object-bottom z-10" />
+
+                            <!-- Floating Stats Box -->
+                            <div class="bg-[#F5F0E6] p-6 lg:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.05)] absolute -bottom-10 lg:bottom-12 -left-4 lg:-left-24 z-20 w-[105%] lg:w-auto lg:min-w-[700px] grid grid-cols-4 items-center">
+                                
+                                <div class="flex flex-col px-2 lg:px-6">
+                                    <span class="font-serif text-2xl lg:text-4xl text-[#1a1a1a] font-light">12+</span>
+                                    <span class="text-[8px] lg:text-[9px] uppercase tracking-widest text-dark/70 font-bold mt-2">YEARS<br />EXPERIENCE</span>
                                 </div>
-                                <div class="space-y-1 border-l border-light pl-4">
-                                    <p class="font-serif text-2xl text-primary font-light">4,000+</p>
-                                    <p class="text-[9px] text-dark/60 uppercase tracking-wider font-semibold leading-tight">Patient Consults</p>
+                                
+                                <div class="flex flex-col px-2 lg:px-6 border-l border-dark/10">
+                                    <span class="font-serif text-2xl lg:text-4xl text-[#1a1a1a] font-light">4,000+</span>
+                                    <span class="text-[8px] lg:text-[9px] uppercase tracking-widest text-dark/70 font-bold mt-2">PATIENT<br />CONSULTATIONS</span>
                                 </div>
-                                <div class="space-y-1 border-l border-light pl-4">
-                                    <p class="font-serif text-2xl text-primary font-light">35+</p>
-                                    <p class="text-[9px] text-dark/60 uppercase tracking-wider font-semibold leading-tight">Publications</p>
+                                
+                                <div class="flex flex-col px-2 lg:px-6 border-l border-dark/10">
+                                    <span class="font-serif text-2xl lg:text-4xl text-[#1a1a1a] font-light">35+</span>
+                                    <span class="text-[8px] lg:text-[9px] uppercase tracking-widest text-dark/70 font-bold mt-2">PUBLICATIONS<br />& RESEARCH</span>
                                 </div>
-                                <div class="space-y-1 border-l border-light pl-4">
-                                    <p class="font-serif text-2xl text-primary font-light">150+</p>
-                                    <p class="text-[9px] text-dark/60 uppercase tracking-wider font-semibold leading-tight">Workshops</p>
+                                
+                                <div class="flex flex-col px-2 lg:px-6 border-l border-dark/10">
+                                    <span class="font-serif text-2xl lg:text-4xl text-[#1a1a1a] font-light">150+</span>
+                                    <span class="text-[8px] lg:text-[9px] uppercase tracking-widest text-dark/70 font-bold mt-2">WORKSHOPS<br />& TALKS</span>
                                 </div>
+
                             </div>
                         </div>
                     </div>
