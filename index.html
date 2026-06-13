@@ -1,1215 +1,900 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  BookOpen, 
-  Calendar, 
-  Award, 
-  GraduationCap, 
-  ChevronRight, 
-  ChevronLeft, 
-  Search, 
-  Copy, 
-  Check, 
-  Menu, 
-  X, 
-  ArrowRight, 
-  FileText, 
-  MessageSquare, 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Briefcase, 
-  Users, 
-  Clock,
-  Sparkles,
-  Info,
-  Play,
-  Heart,
-  ExternalLink
-} from 'lucide-react';
-
-// --- MAIN SPECIALIZATIONS DATA ---
-const SPECIALIZATIONS = [
-  { id: 'trauma', title: 'Trauma & PTSD', icon: '✨', desc: 'Deep psychological recovery from past trauma using advanced somatic integration.' },
-  { id: 'anxiety', title: 'Anxiety Disorders', icon: '🧘', desc: 'Comprehensive therapy for panic attacks, social anxiety, and autonomic regulation.' },
-  { id: 'depression', title: 'Clinical Depression', icon: '🌱', desc: 'Holistic medical assessment and personalized affective recovery planning.' },
-  { id: 'burnout', title: 'Burnout Management', icon: '⏳', desc: 'Specialized cognitive recovery programs for high-performing professionals.' },
-  { id: 'adult-mental', title: 'Adult Mental Health', icon: '🤝', desc: 'Thorough diagnostic evaluation for adult neuropsychiatric challenges.' },
-  { id: 'stress', title: 'Stress Disorders', icon: '🔥', desc: 'Restructuring the nervous system\'s adaptive responses to chronic pressure.' },
-  { id: 'crisis', title: 'Crisis Psychiatry', icon: '🛡️', desc: 'Acute emergency interventions that are safe, structured, and secure.' },
-  { id: 'recovery', title: 'Recovery Programs', icon: '🔄', desc: 'Sustainable, long-term psychiatric rehabilitation and care plans.' }
-];
-
-// --- CAREER TIMELINE DATA ---
-const JOURNEY = [
-  { year: '2016', role: 'Medical Internship', institution: 'Mater Dei Hospital, Malta', desc: 'Started formal clinical rotations post-graduation in acute and emergency medical units.' },
-  { year: '2017', role: 'Junior Doctor', institution: 'Mater Dei Mental Health Services', desc: 'Initial focus on acute psychiatric ward care and biological protocols.' },
-  { year: '2018', role: 'Psychiatry Registrar', institution: 'South London and Maudsley NHS Trust', desc: 'Intensive psychiatric specialization in the UK\'s leading mental health referral center.' },
-  { year: '2020', role: 'Senior Registrar', institution: 'King\'s College London / NHS', desc: 'Led clinical trials for somatic trauma therapy and supervised psychiatry residents.' },
-  { year: '2023', role: 'Consultant Psychiatrist', institution: 'Private Practice & NHS Consultant, London', desc: 'Opened a specialist clinic for trauma, executive burnout, and premium psychiatry.' }
-];
-
-// --- RESEARCH & PUBLICATIONS DATA ---
-const PUBLICATIONS = [
-  {
-    id: 'pub-1',
-    category: 'Research Paper',
-    year: '2024',
-    journal: 'Journal of Affective Disorders',
-    title: 'The Long-Term Impact of Childhood Trauma on Emotional Regulation',
-    summary: 'Empirical evaluation of the impact of childhood trauma on adult emotional stability.',
-    citation: 'Vella, E. M. (2024). The Long-Term Impact of Childhood Trauma on Emotional Regulation. Journal of Affective Disorders, 312, 145-159.'
-  },
-  {
-    id: 'pub-2',
-    category: 'Clinical Study',
-    year: '2023',
-    journal: 'BMC Psychiatry',
-    title: 'Burnout in Healthcare Professionals: A Cross-Sectional Analysis',
-    summary: 'Comprehensive study on prefrontal fatigue levels in medical staff during post-pandemic recovery.',
-    citation: 'Vella, E. M. (2023). Burnout in Healthcare Professionals: A Cross-Sectional Analysis. BMC Psychiatry, 23(1), 89-102.'
-  },
-  {
-    id: 'pub-3',
-    category: 'Review',
-    year: '2021',
-    journal: 'The Lancet Psychiatry',
-    title: 'Anxiety Disorders in Adults: Evidence-Based Treatment Approaches',
-    summary: 'Critical review of pharmacotherapy protocols and psychosocial integration in managing acute anxiety.',
-    citation: 'Vella, E. M. (2021). Anxiety Disorders in Adults: Evidence-Based Treatment Approaches. The Lancet Psychiatry, 8(4), 312-325.'
-  }
-];
-
-// --- EVENTS & SEMINARS DATA ---
-const EVENTS = [
-  {
-    id: 'evt-1',
-    title: 'London Mental Health Summit',
-    date: 'May 2024',
-    bgClass: 'bg-[#152e47]',
-    image: 'https://raw.githubusercontent.com/lengkongandreuw/drelena/main/heroimage2.png',
-    desc: 'Presentation of cutting-edge somatic integration methods for complex PTSD treatment.'
-  },
-  {
-    id: 'evt-2',
-    title: 'The Future of Psychiatry Conference',
-    date: 'October 2023',
-    bgClass: 'bg-[#213a52]',
-    image: 'https://raw.githubusercontent.com/lengkongandreuw/drelena/main/heroimage1.png',
-    desc: 'Panel discussion on the future of autonomic regulation in treating anxiety disorders.'
-  },
-  {
-    id: 'evt-3',
-    title: 'Trauma-Informed Care Workshop',
-    date: 'June 2023',
-    bgClass: 'bg-[#0F1B2A]',
-    image: 'https://raw.githubusercontent.com/lengkongandreuw/drelena/main/heroimage2.png',
-    desc: 'Clinical workshop for medical practitioners on trauma-informed approaches.'
-  }
-];
-
-// --- PATIENT TESTIMONIALS ---
-const TESTIMONIALS = [
-  {
-    quote: "Her calm approach and deep understanding helped me rebuild my confidence after years of severe anxiety.",
-    author: "ANONYMOUS PATIENT",
-    role: "Financial Professional, London"
-  },
-  {
-    quote: "Dr. Elena provided an incredibly safe space for me to process past trauma that had hindered my career and relationships.",
-    author: "ANONYMOUS PATIENT",
-    role: "Senior Academic"
-  },
-  {
-    quote: "Private consulting sessions with Dr. Elena are the best mental health investment I've ever made. She is highly authoritative yet full of empathy.",
-    author: "ANONYMOUS PATIENT",
-    role: "Executive Director"
-  }
-];
-
-export default function App() {
-  const [activeTab, setActiveTab] = useState('home');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [selectedJourney, setSelectedJourney] = useState(4); // Default to 2023
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const [showVideoModal, setShowVideoModal] = useState(false);
-  const [showBookingModal, setShowBookingModal] = useState(false);
-  const [copiedId, setCopiedId] = useState(null);
-
-  // Search & Filter
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-
-  // Speaking Carousel
-  const [speakingIndex, setSpeakingIndex] = useState(0);
-
-  // Booking Form State
-  const [bookingForm, setBookingForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    reason: 'Clinical Consultation',
-    message: '',
-    consent: false
-  });
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  // Digital Assistant (AI) Integration
-  const [aiChat, setAiChat] = useState([
-    { role: 'assistant', text: 'Hello, I am Dr. Elena Marie Vella\'s digital assistant. You can ask about trauma therapy specializations, burnout management, research publications, or how to book a consultation schedule in London.' }
-  ]);
-  const [aiInput, setAiInput] = useState('');
-  const [aiLoading, setAiLoading] = useState(false);
-
-  // Images URLs
-  const heroImage1 = "https://raw.githubusercontent.com/lengkongandreuw/drelena/main/heroimage1.png";
-  const heroImage2 = "https://raw.githubusercontent.com/lengkongandreuw/drelena/main/heroimage2.png";
-
-  // Google Fonts Loader
-  useEffect(() => {
-    const link = document.createElement('link');
-    link.href = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&display=swap';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
-    return () => document.head.removeChild(link);
-  }, []);
-
-  // Testimonial Auto-slider
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % TESTIMONIALS.length);
-    }, 8000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Citation Copy Handler
-  const handleCopyCitation = (citation, id) => {
-    const el = document.createElement('textarea');
-    el.value = citation;
-    document.body.appendChild(el);
-    el.select();
-    try {
-      document.execCommand('copy');
-      setCopiedId(id);
-      setTimeout(() => setCopiedId(null), 2000);
-    } catch (err) {
-      console.error('Failed to copy citation', err);
-    }
-    document.body.removeChild(el);
-  };
-
-  // Booking Form Submit
-  const handleBookingSubmit = (e) => {
-    e.preventDefault();
-    if (!bookingForm.name || !bookingForm.email || !bookingForm.message) return;
-    setIsSubmitted(true);
-  };
-
-  // Digital Assistant Message Handler
-  const handleAiMessage = (e) => {
-    e.preventDefault();
-    if (!aiInput.trim()) return;
-
-    const userMsg = aiInput;
-    setAiChat(prev => [...prev, { role: 'user', text: userMsg }]);
-    setAiInput('');
-    setAiLoading(true);
-
-    setTimeout(() => {
-      let reply = "";
-      const lower = userMsg.toLowerCase();
-      if (lower.includes('trauma') || lower.includes('ptsd')) {
-        reply = "Dr. Elena combines autonomic nervous system science with somatic trauma recovery. We provide structured 90-minute trauma assessment sessions.";
-      } else if (lower.includes('burnout') || lower.includes('stress') || lower.includes('fatigue')) {
-        reply = "Executive burnout therapy focuses on prefrontal cortex recovery, setting healthy boundaries, and regulating circadian work rhythms.";
-      } else if (lower.includes('fee') || lower.includes('cost') || lower.includes('price')) {
-        reply = "Fees vary depending on the session type. Initial comprehensive assessments can be claimed through premium insurance like Bupa, AXA, and Allianz.";
-      } else if (lower.includes('appointment') || lower.includes('schedule') || lower.includes('consultation') || lower.includes('book')) {
-        reply = "You can fill out the registration form in the 'Booking Portal' section or click the 'Book Consultation' button in the top right corner to schedule a direct session.";
-      } else {
-        reply = "Thank you for your message. Dr. Elena's practice in Harley Street, London focuses on anxiety, PTSD, and mental fatigue (burnout). Are there any specific symptoms you'd like to discuss?";
-      }
-
-      setAiChat(prev => [...prev, { role: 'assistant', text: reply }]);
-      setAiLoading(false);
-    }, 800);
-  };
-
-  // Event Carousel Navigation
-  const nextSpeaking = () => {
-    setSpeakingIndex((prev) => (prev + 1) % EVENTS.length);
-  };
-
-  const prevSpeaking = () => {
-    setSpeakingIndex((prev) => (prev - 1 + EVENTS.length) % EVENTS.length);
-  };
-
-  // Publications Filter
-  const filteredPubs = PUBLICATIONS.filter(pub => {
-    const matchesSearch = pub.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          pub.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          pub.journal.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCat = selectedCategory === 'All' || pub.category === selectedCategory;
-    return matchesSearch && matchesCat;
-  });
-
-  return (
-    <div className="min-h-screen bg-[#F8F5F0] text-[#2D2D2D] font-sans selection:bg-[#C9A86A] selection:text-white flex flex-col transition-all duration-300">
-      
-      {/* Custom CSS for Animations */}
-      <style>{`
-        .font-serif {
-          font-family: 'Cormorant Garamond', Georgia, serif;
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Elena Marie Vella | Consultant Psychiatrist</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Cormorant Garamond', 'Georgia', 'serif'],
+                    },
+                    colors: {
+                        primary: '#0D1B2A',
+                        accent: '#C9A86A',
+                        base: '#F8F5F0',
+                        dark: '#2D2D2D',
+                        light: '#E8E8E8'
+                    }
+                }
+            }
         }
+    </script>
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Custom Animations -->
+    <style>
         @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .animate-fadeInUp {
-          animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.8s ease-in-out both;
         }
         .animate-delay-100 { animation-delay: 100ms; }
         .animate-delay-200 { animation-delay: 200ms; }
-        .animate-delay-300 { animation-delay: 300ms; }
-      `}</style>
+    </style>
+</head>
+<body class="bg-base text-dark font-sans selection:bg-accent selection:text-white flex flex-col min-h-screen">
 
-      {/* --- MAIN NAVIGATION (HEADER) --- */}
-      <header className="sticky top-0 z-50 bg-[#F8F5F0]/90 backdrop-blur-md border-b border-[#E8E8E8] transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-24">
-            
-            {/* Left Logo */}
-            <div className="flex flex-col cursor-pointer" onClick={() => setActiveTab('home')}>
-              <span className="font-serif text-lg sm:text-2xl tracking-[0.1em] text-[#0D1B2A] font-light leading-none">
-                DR. ELENA MARIE VELLA
-              </span>
-              <span className="text-[9px] tracking-[0.25em] text-[#C9A86A] uppercase font-semibold mt-1">
-                Consultant Psychiatrist
-              </span>
+    <!-- --- HEADER --- -->
+    <header class="sticky top-0 z-50 bg-base/90 backdrop-blur-md border-b border-light transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-24">
+                
+                <!-- Left Logo -->
+                <a href="#home" class="flex flex-col cursor-pointer">
+                    <span class="font-serif text-lg sm:text-2xl tracking-[0.1em] text-primary font-light leading-none">
+                        DR. ELENA MARIE VELLA
+                    </span>
+                    <span class="text-[9px] tracking-[0.25em] text-accent uppercase font-semibold mt-1">
+                        Consultant Psychiatrist
+                    </span>
+                </a>
+
+                <!-- Center Navigation -->
+                <nav class="hidden lg:flex space-x-8">
+                    <a href="#about" class="nav-link text-xs uppercase tracking-[0.2em] font-medium text-dark/80 hover:text-primary transition-colors duration-200 relative group">
+                        About
+                        <span class="absolute bottom-[-6px] left-0 right-0 h-[1.5px] bg-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
+                    </a>
+                    <a href="#experience" class="nav-link text-xs uppercase tracking-[0.2em] font-medium text-dark/80 hover:text-primary transition-colors duration-200 relative group">
+                        Experience
+                        <span class="absolute bottom-[-6px] left-0 right-0 h-[1.5px] bg-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
+                    </a>
+                    <a href="#specializations" class="nav-link text-xs uppercase tracking-[0.2em] font-medium text-dark/80 hover:text-primary transition-colors duration-200 relative group">
+                        Specializations
+                        <span class="absolute bottom-[-6px] left-0 right-0 h-[1.5px] bg-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
+                    </a>
+                    <a href="#research" class="nav-link text-xs uppercase tracking-[0.2em] font-medium text-dark/80 hover:text-primary transition-colors duration-200 relative group">
+                        Research
+                        <span class="absolute bottom-[-6px] left-0 right-0 h-[1.5px] bg-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
+                    </a>
+                    <a href="#speaking" class="nav-link text-xs uppercase tracking-[0.2em] font-medium text-dark/80 hover:text-primary transition-colors duration-200 relative group">
+                        Speaking
+                        <span class="absolute bottom-[-6px] left-0 right-0 h-[1.5px] bg-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
+                    </a>
+                    <a href="#contact" class="nav-link text-xs uppercase tracking-[0.2em] font-medium text-dark/80 hover:text-primary transition-colors duration-200 relative group">
+                        Contact
+                        <span class="absolute bottom-[-6px] left-0 right-0 h-[1.5px] bg-accent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
+                    </a>
+                </nav>
+
+                <!-- Right Action -->
+                <div class="hidden lg:flex items-center space-x-4">
+                    <button onclick="toggleBookingModal(true)" class="bg-primary text-white hover:bg-accent hover:text-primary px-6 py-3 text-xs tracking-widest uppercase font-bold transition-all duration-300 flex items-center gap-2 border border-transparent hover:border-primary">
+                        Book Consultation <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Trigger -->
+                <div class="lg:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="p-2 text-primary hover:text-accent transition-colors">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+
             </div>
-
-            {/* Center Navigation Menu */}
-            <nav className="hidden lg:flex space-x-8">
-              {[
-                { id: 'about', label: 'About' },
-                { id: 'experience', label: 'Experience' },
-                { id: 'specializations', label: 'Specializations' },
-                { id: 'research', label: 'Research' },
-                { id: 'speaking', label: 'Speaking' },
-                { id: 'contact', label: 'Contact' }
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setActiveTab('home');
-                    setTimeout(() => {
-                      const el = document.getElementById(item.id);
-                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 100);
-                  }}
-                  className="text-xs uppercase tracking-[0.2em] font-medium text-[#2D2D2D]/80 hover:text-[#0D1B2A] transition-colors duration-200 relative group"
-                >
-                  {item.label}
-                  <span className="absolute bottom-[-6px] left-0 right-0 h-[1.5px] bg-[#C9A86A] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
-                </button>
-              ))}
-            </nav>
-
-            {/* Right Action */}
-            <div className="hidden lg:flex items-center space-x-4">
-              <button 
-                onClick={() => setShowBookingModal(true)}
-                className="bg-[#0D1B2A] text-white hover:bg-[#C9A86A] hover:text-[#0D1B2A] px-6 py-3 text-xs tracking-widest uppercase font-bold transition-all duration-300 flex items-center gap-2 border border-transparent hover:border-[#0D1B2A]"
-              >
-                Book Consultation <ArrowRight size={14} />
-              </button>
-            </div>
-
-            {/* Mobile Menu Trigger */}
-            <div className="lg:hidden flex items-center">
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 text-[#0D1B2A] hover:text-[#C9A86A] transition-colors"
-              >
-                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
-            </div>
-
-          </div>
         </div>
 
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-[#F8F5F0] border-b border-[#E8E8E8] px-4 pt-2 pb-6 space-y-1 shadow-lg animate-fadeIn">
-            {[
-              { id: 'about', label: 'About Dr. Elena' },
-              { id: 'experience', label: 'Career Journey' },
-              { id: 'specializations', label: 'Specializations' },
-              { id: 'research', label: 'Research & Journals' },
-              { id: 'speaking', label: 'Speaking & Media' },
-              { id: 'contact', label: 'Booking Portal' }
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setTimeout(() => {
-                    const el = document.getElementById(item.id);
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }, 100);
-                }}
-                className="block w-full text-left px-4 py-3.5 text-xs uppercase tracking-widest font-bold text-[#2D2D2D] hover:bg-[#E8E8E8] transition-colors"
-              >
-                {item.label}
-              </button>
-            ))}
-            <div className="pt-4 px-4">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setShowBookingModal(true);
-                }}
-                className="w-full text-center bg-[#C9A86A] text-[#0D1B2A] py-3 text-xs font-bold uppercase tracking-widest hover:bg-[#0D1B2A] hover:text-white transition-all"
-              >
-                Book Consultation
-              </button>
+        <!-- Mobile Navigation Drawer -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-base border-b border-light px-4 pt-2 pb-6 space-y-1 shadow-lg absolute w-full">
+            <a href="#about" class="mobile-nav-link block w-full text-left px-4 py-3.5 text-xs uppercase tracking-widest font-bold text-dark hover:bg-light transition-colors">About Dr. Elena</a>
+            <a href="#experience" class="mobile-nav-link block w-full text-left px-4 py-3.5 text-xs uppercase tracking-widest font-bold text-dark hover:bg-light transition-colors">Career Journey</a>
+            <a href="#specializations" class="mobile-nav-link block w-full text-left px-4 py-3.5 text-xs uppercase tracking-widest font-bold text-dark hover:bg-light transition-colors">Specializations</a>
+            <a href="#research" class="mobile-nav-link block w-full text-left px-4 py-3.5 text-xs uppercase tracking-widest font-bold text-dark hover:bg-light transition-colors">Research & Journals</a>
+            <a href="#speaking" class="mobile-nav-link block w-full text-left px-4 py-3.5 text-xs uppercase tracking-widest font-bold text-dark hover:bg-light transition-colors">Speaking & Media</a>
+            <a href="#contact" class="mobile-nav-link block w-full text-left px-4 py-3.5 text-xs uppercase tracking-widest font-bold text-dark hover:bg-light transition-colors">Booking Portal</a>
+            <div class="pt-4 px-4">
+                <button onclick="toggleBookingModal(true)" class="w-full text-center bg-accent text-primary py-3 text-xs font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all">
+                    Book Consultation
+                </button>
             </div>
-          </div>
-        )}
-      </header>
+        </div>
+    </header>
 
-      {/* --- MAIN PANEL --- */}
-      <main className="flex-grow">
+    <main class="flex-grow">
         
-        {/* ==================================== */}
-        {/* LANDING PAGE */}
-        {/* ==================================== */}
-        <div className="animate-fadeIn">
-          
-          {/* 1. HERO SECTION */}
-          <section className="relative overflow-hidden py-12 lg:py-20 border-b border-[#E8E8E8] bg-[#F8F5F0]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                
-                {/* Left Column: Text & Credentials */}
-                <div className="lg:col-span-6 space-y-8 animate-fadeInUp">
-                  
-                  <div className="flex items-center gap-3">
-                    <span className="w-8 h-[1px] bg-[#C9A86A]"></span>
-                    <p className="text-xs uppercase tracking-[0.25em] text-[#C9A86A] font-semibold">
-                      Understanding the story behind human resilience.
-                    </p>
-                  </div>
-
-                  <h1 className="font-serif text-5xl sm:text-7xl lg:text-8xl text-[#0D1B2A] leading-none font-light tracking-tight">
-                    DR. ELENA VELLA
-                  </h1>
-                  
-                  <p className="text-xs tracking-[0.3em] text-[#C9A86A] uppercase font-bold">
-                    CONSULTANT PSYCHIATRIST
-                  </p>
-                  
-                  <p className="text-[#2D2D2D]/80 text-base max-w-md leading-relaxed font-light">
-                    Specializing in trauma recovery, anxiety disorders, burnout management, and adult mental health. Based in London with an integrative approach.
-                  </p>
-                  
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap gap-4 pt-4">
-                    <button 
-                      onClick={() => setShowBookingModal(true)}
-                      className="bg-[#0D1B2A] text-white hover:bg-[#C9A86A] hover:text-[#0D1B2A] px-8 py-4 text-xs tracking-widest uppercase font-bold transition-all duration-300 flex items-center gap-3 shadow-md hover:-translate-y-0.5 transform"
-                    >
-                      Book Consultation <ArrowRight size={14} />
-                    </button>
+        <!-- 1. HERO SECTION -->
+        <section id="home" class="relative overflow-hidden py-12 lg:py-20 border-b border-light bg-base pt-24 -mt-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
                     
-                    <button 
-                      onClick={() => setShowVideoModal(true)}
-                      className="flex items-center gap-3 text-xs uppercase tracking-widest font-bold text-[#0D1B2A] hover:text-[#C9A86A] transition-colors group"
-                    >
-                      <span className="w-10 h-10 rounded-full border border-[#0D1B2A]/20 flex items-center justify-center group-hover:border-[#C9A86A] transition-colors">
-                        <Play size={12} className="fill-current ml-0.5" />
-                      </span>
-                      Watch Intro
-                    </button>
-                  </div>
+                    <!-- Left Column: Text & Credentials -->
+                    <div class="lg:col-span-6 space-y-8 animate-fadeInUp">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-[1px] bg-accent"></span>
+                            <p class="text-xs uppercase tracking-[0.25em] text-accent font-semibold">
+                                Understanding the story behind human resilience.
+                            </p>
+                        </div>
 
-                </div>
-
-                {/* Right Column: Elena's Photo & Floating Stats */}
-                <div className="lg:col-span-6 relative animate-fadeIn">
-                  <div className="relative mx-auto max-w-md lg:max-w-none">
-                    
-                    {/* Main Photo Frame using heroimage1.png */}
-                    <div className="aspect-[4/5] bg-[#E8E8E8] relative overflow-hidden shadow-2xl">
-                      <img 
-                        src={heroImage1}
-                        alt="Dr. Elena Vella - Professional Portrait" 
-                        className="absolute inset-0 w-full h-full object-cover object-center" 
-                      />
-                    </div>
-
-                    {/* Floating Stats Block */}
-                    <div className="bg-white p-6 sm:p-8 mt-6 border border-[#E8E8E8] shadow-lg grid grid-cols-2 sm:grid-cols-4 gap-6 relative z-20">
-                      <div className="space-y-1">
-                        <p className="font-serif text-2xl text-[#0D1B2A] font-light">12+</p>
-                        <p className="text-[9px] text-[#2D2D2D]/60 uppercase tracking-wider font-semibold leading-tight">Years Experience</p>
-                      </div>
-                      <div className="space-y-1 border-l border-[#E8E8E8] pl-4">
-                        <p className="font-serif text-2xl text-[#0D1B2A] font-light">4,000+</p>
-                        <p className="text-[9px] text-[#2D2D2D]/60 uppercase tracking-wider font-semibold leading-tight">Patient Consults</p>
-                      </div>
-                      <div className="space-y-1 border-l border-[#E8E8E8] pl-4">
-                        <p className="font-serif text-2xl text-[#0D1B2A] font-light">35+</p>
-                        <p className="text-[9px] text-[#2D2D2D]/60 uppercase tracking-wider font-semibold leading-tight">Publications</p>
-                      </div>
-                      <div className="space-y-1 border-l border-[#E8E8E8] pl-4">
-                        <p className="font-serif text-2xl text-[#0D1B2A] font-light">150+</p>
-                        <p className="text-[9px] text-[#2D2D2D]/60 uppercase tracking-wider font-semibold leading-tight">Workshops</p>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </section>
-
-          {/* 2. ABOUT PREVIEW SECTION */}
-          <section id="about" className="py-24 bg-[#F8F5F0] border-b border-[#E8E8E8]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-                
-                {/* Left: Vertical Text & Image */}
-                <div className="lg:col-span-5 flex gap-8 items-stretch">
-                  <div className="hidden sm:block">
-                    <p className="text-[9px] uppercase tracking-[0.4em] text-[#C9A86A] font-bold origin-top-left transform rotate-90 whitespace-nowrap translate-x-4 mt-8">
-                      ABOUT DR. ELENA VELLA
-                    </p>
-                  </div>
-                  
-                  {/* Image using heroimage2.png */}
-                  <div className="aspect-[3/4] bg-[#E8E8E8] relative overflow-hidden shadow-xl flex-grow">
-                    <img 
-                      src={heroImage2} 
-                      alt="Dr. Elena Vella Consulting" 
-                      className="absolute inset-0 w-full h-full object-cover object-center" 
-                    />
-                  </div>
-                </div>
-
-                {/* Right: Philosophy Statement */}
-                <div className="lg:col-span-7 space-y-6">
-                  <h2 className="font-serif text-3xl sm:text-5xl text-[#0D1B2A] font-light leading-tight">
-                    People rarely break in an instant. <br />
-                    <span className="italic text-[#C9A86A]">They break slowly, in silence.</span>
-                  </h2>
-                  
-                  <p className="text-[#2D2D2D]/85 text-base leading-relaxed font-light">
-                    I help individuals navigate the unseen emotional burdens that impact their mental well-being. My approach is collaborative, evidence-based, and intimately tailored to the human behind the story.
-                  </p>
-                  
-                  <div className="pt-4">
-                    <button 
-                      onClick={() => {
-                        const el = document.getElementById('experience');
-                        if (el) el.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                      className="text-xs uppercase tracking-widest font-bold text-[#0D1B2A] hover:text-[#C9A86A] transition-colors flex items-center gap-2 group"
-                    >
-                      READ MY STORY <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                    </button>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </section>
-
-          {/* 3. AREAS OF SPECIALIZATION SECTION */}
-          <section id="specializations" className="py-24 bg-white border-b border-[#E8E8E8]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              
-              <div className="flex justify-between items-end border-b border-[#E8E8E8] pb-6 mb-12">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-[#C9A86A] font-bold">CORE SPECIALIZATIONS</p>
-                  <h2 className="font-serif text-3xl sm:text-4xl text-[#0D1B2A] font-light mt-1">Clinical Treatment Areas</h2>
-                </div>
-                <button 
-                  onClick={() => setShowBookingModal(true)}
-                  className="text-xs uppercase tracking-widest font-bold text-[#0D1B2A] hover:text-[#C9A86A] transition-colors flex items-center gap-2 group"
-                >
-                  VIEW ALL <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                </button>
-              </div>
-
-              {/* Grid 8 Specializations */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                {SPECIALIZATIONS.map((spec) => (
-                  <div 
-                    key={spec.id}
-                    className="p-8 border border-[#E8E8E8] hover:border-[#C9A86A] hover:shadow-lg transition-all duration-300 flex flex-col justify-between min-h-[220px] group cursor-pointer"
-                    onClick={() => {
-                      setBookingForm(prev => ({ ...prev, message: `I would like to schedule an initial consultation regarding: ${spec.title}` }));
-                      setShowBookingModal(true);
-                    }}
-                  >
-                    <div className="space-y-4">
-                      <div className="text-3xl text-[#C9A86A] filter grayscale group-hover:grayscale-0 transition-all">
-                        {spec.icon}
-                      </div>
-                      <h3 className="font-serif text-xl font-medium text-[#0D1B2A] group-hover:text-[#C9A86A] transition-colors">
-                        {spec.title}
-                      </h3>
-                      <p className="text-xs text-[#2D2D2D]/70 leading-relaxed font-light">
-                        {spec.desc}
-                      </p>
-                    </div>
-                    <div className="pt-4 flex items-center justify-end">
-                      <span className="text-[10px] uppercase tracking-widest font-bold text-[#C9A86A] group-hover:text-[#0D1B2A] flex items-center gap-1">
-                        Select <ChevronRight size={12} />
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-            </div>
-          </section>
-
-          {/* 4. MY JOURNEY */}
-          <section id="experience" className="py-24 bg-[#F8F5F0] border-b border-[#E8E8E8]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              
-              <div className="flex justify-between items-end border-b border-[#E8E8E8] pb-6 mb-16">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-[#C9A86A] font-bold">CAREER TIMELINE</p>
-                  <h2 className="font-serif text-3xl sm:text-4xl text-[#0D1B2A] font-light mt-1">Clinical & Research Journey</h2>
-                </div>
-                <button 
-                  onClick={() => {
-                    const el = document.getElementById('research');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="text-xs uppercase tracking-widest font-bold text-[#0D1B2A] hover:text-[#C9A86A] transition-colors flex items-center gap-2 group"
-                >
-                  SEE FULL EXPERIENCE <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                </button>
-              </div>
-
-              {/* Horizontal Timeline Navigation */}
-              <div className="relative mb-12">
-                <div className="absolute top-1/2 left-0 right-0 h-[1.5px] bg-[#E8E8E8] -translate-y-1/2 hidden md:block"></div>
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-6 relative z-10">
-                  {JOURNEY.map((item, index) => (
-                    <button
-                      key={item.year}
-                      onClick={() => setSelectedJourney(index)}
-                      className="flex flex-col items-center text-center group focus:outline-none"
-                    >
-                      <span className={`text-xs uppercase tracking-widest font-bold mb-3 transition-colors ${
-                        selectedJourney === index ? 'text-[#C9A86A]' : 'text-[#2D2D2D]/50'
-                      }`}>
-                        Year {item.year}
-                      </span>
-                      
-                      <span className={`w-4 h-4 rounded-full border-2 transition-all duration-300 ${
-                        selectedJourney === index 
-                          ? 'bg-[#C9A86A] border-[#0D1B2A] scale-125 shadow-md' 
-                          : 'bg-white border-[#E8E8E8] group-hover:border-[#C9A86A]'
-                      }`}></span>
-
-                      <span className="text-xs font-semibold text-[#0D1B2A] mt-3 block">
-                        {item.role}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Active Year Detail Box */}
-              <div className="bg-white p-8 sm:p-12 border border-[#E8E8E8] shadow-sm relative overflow-hidden transition-all duration-500 min-h-[220px] flex flex-col justify-between">
-                <div className="absolute right-6 top-0 font-serif text-[12rem] text-[#C9A86A]/5 font-bold leading-none select-none pointer-events-none">
-                  {JOURNEY[selectedJourney].year}
-                </div>
-                
-                <div className="space-y-4 relative z-10 animate-fadeIn">
-                  <div className="inline-block bg-[#0D1B2A] text-[#C9A86A] text-[10px] font-bold uppercase tracking-widest px-3 py-1">
-                    Era {JOURNEY[selectedJourney].year}
-                  </div>
-                  <h3 className="font-serif text-2xl sm:text-3xl text-[#0D1B2A] font-light">
-                    {JOURNEY[selectedJourney].role}
-                  </h3>
-                  <p className="text-xs text-[#C9A86A] uppercase tracking-widest font-semibold">
-                    {JOURNEY[selectedJourney].institution}
-                  </p>
-                  <p className="text-sm text-[#2D2D2D]/80 leading-relaxed font-light max-w-2xl">
-                    {JOURNEY[selectedJourney].desc}
-                  </p>
-                </div>
-              </div>
-
-            </div>
-          </section>
-
-          {/* 5. RESEARCH & PUBLICATIONS SECTION */}
-          <section id="research" className="py-24 bg-white border-b border-[#E8E8E8]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              
-              <div className="flex justify-between items-end border-b border-[#E8E8E8] pb-6 mb-12">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-[#C9A86A] font-bold">RESEARCH LIBRARY</p>
-                  <h2 className="font-serif text-3xl sm:text-4xl text-[#0D1B2A] font-light mt-1">Scientific Journals & Publications</h2>
-                </div>
-                <button 
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedCategory('All');
-                  }}
-                  className="text-xs uppercase tracking-widest font-bold text-[#0D1B2A] hover:text-[#C9A86A] transition-colors flex items-center gap-2 group"
-                >
-                  VIEW ALL PUBLICATIONS <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                </button>
-              </div>
-
-              {/* Search & Filter Controls */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-8">
-                <div className="md:col-span-6 relative">
-                  <Search className="absolute left-3 top-3 text-[#2D2D2D]/40" size={16} />
-                  <input 
-                    type="text"
-                    placeholder="Search research by title..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-[#F8F5F0] border border-[#E8E8E8] pl-10 pr-4 py-2.5 text-xs focus:outline-none focus:border-[#C9A86A] transition-all"
-                  />
-                </div>
-                <div className="md:col-span-6 flex flex-wrap gap-2 justify-start md:justify-end">
-                  {['All', 'Research Paper', 'Clinical Study', 'Review'].map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`px-3 py-1.5 text-[9px] font-bold tracking-widest uppercase transition-all ${
-                        selectedCategory === cat 
-                          ? 'bg-[#0D1B2A] text-[#C9A86A]' 
-                          : 'bg-[#F8F5F0] text-[#2D2D2D] hover:bg-[#E8E8E8]'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Publication Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {filteredPubs.map((pub) => (
-                  <div 
-                    key={pub.id}
-                    className="bg-[#F8F5F0] p-8 border border-[#E8E8E8] flex flex-col justify-between min-h-[350px] hover:shadow-md transition-all relative group"
-                  >
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center text-[10px] text-[#2D2D2D]/50 tracking-wider uppercase font-semibold">
-                        <span>{pub.year} • {pub.category}</span>
-                        <span className="text-[#C9A86A] font-serif">{pub.journal}</span>
-                      </div>
-                      
-                      <h3 className="font-serif text-xl font-medium text-[#0D1B2A] tracking-tight group-hover:text-[#C9A86A] transition-colors leading-snug">
-                        {pub.title}
-                      </h3>
-                      
-                      <p className="text-xs text-[#2D2D2D]/75 leading-relaxed font-light italic border-l border-[#C9A86A] pl-3 py-1">
-                        "{pub.summary}"
-                      </p>
-                    </div>
-
-                    <div className="pt-6 border-t border-[#E8E8E8] mt-6 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2">
-                      <button 
-                        onClick={() => handleCopyCitation(pub.citation, pub.id)}
-                        className="text-[9px] uppercase tracking-widest font-bold text-[#0D1B2A] hover:text-[#C9A86A] flex items-center gap-1"
-                      >
-                        {copiedId === pub.id ? (
-                          <>✓ Copied (APA)</>
-                        ) : (
-                          <><Copy size={12} /> Copy Citation</>
-                        )}
-                      </button>
-
-                      <button 
-                        onClick={() => {
-                          setBookingForm(prev => ({
-                            ...prev,
-                            reason: 'Research Collaboration',
-                            message: `Hello Dr. Elena, I am interested in discussing your research publication: "${pub.title}". Could you please provide information on full-text PDF availability?`
-                          }));
-                          setShowBookingModal(true);
-                        }}
-                        className="text-[9px] uppercase tracking-widest font-bold text-[#C9A86A] hover:text-[#0D1B2A] flex items-center gap-1.5"
-                      >
-                        Request PDF <ArrowRight size={10} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-            </div>
-          </section>
-
-          {/* 6. SPEAKING & TEACHING SECTION */}
-          <section id="speaking" className="py-24 bg-[#0F1B2A] text-white overflow-hidden relative">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-              
-              <div className="border-b border-white/10 pb-6 mb-12 flex justify-between items-end">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-[#C9A86A] font-bold">PUBLIC PRESENTATIONS</p>
-                  <h2 className="font-serif text-3xl sm:text-4xl text-white font-light mt-1">Education & International Symposia</h2>
-                </div>
-                <div className="flex gap-2">
-                  <button 
-                    onClick={prevSpeaking}
-                    className="w-10 h-10 border border-white/20 hover:border-[#C9A86A] flex items-center justify-center transition-colors text-white hover:text-[#C9A86A]"
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-                  <button 
-                    onClick={nextSpeaking}
-                    className="w-10 h-10 border border-white/20 hover:border-[#C9A86A] flex items-center justify-center transition-colors text-white hover:text-[#C9A86A]"
-                  >
-                    <ChevronRight size={16} />
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-                
-                {/* Left Panel */}
-                <div className="lg:col-span-4 bg-[#152e47] p-8 sm:p-10 flex flex-col justify-between">
-                  <div className="space-y-4">
-                    <p className="text-[10px] uppercase tracking-widest text-[#C9A86A] font-semibold">Speaking & Teaching</p>
-                    <h3 className="font-serif text-2xl text-white font-light leading-snug">
-                      Keynote speaker for clinical symposia, corporate leadership, and global health media.
-                    </h3>
-                  </div>
-                  <div className="pt-8">
-                    <button 
-                      onClick={() => {
-                        setBookingForm(prev => ({ ...prev, reason: 'Speaking Invitation' }));
-                        setShowBookingModal(true);
-                      }}
-                      className="text-xs uppercase tracking-widest font-bold text-[#C9A86A] hover:text-white flex items-center gap-2 transition-colors"
-                    >
-                      SEND INVITATION <ArrowRight size={14} />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Right Panel: Active Slide Card */}
-                <div className="lg:col-span-8 relative min-h-[350px] bg-gradient-to-r from-[#1c324b] to-[#0F1B2A] border border-white/10 overflow-hidden flex flex-col justify-end p-8 sm:p-12">
-                  
-                  {/* Background Image representation */}
-                  <img 
-                      src={EVENTS[speakingIndex].image}
-                      alt="Speaking Event Background" 
-                      className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay" 
-                  />
-
-                  <div className="space-y-4 relative z-10 animate-fadeIn">
-                    <span className="text-xs uppercase tracking-widest text-[#C9A86A] font-bold">
-                      {EVENTS[speakingIndex].date}
-                    </span>
-                    <h3 className="font-serif text-3xl sm:text-4xl text-white font-light">
-                      {EVENTS[speakingIndex].title}
-                    </h3>
-                    <p className="text-sm text-[#E8E8E8]/70 leading-relaxed font-light max-w-xl">
-                      {EVENTS[speakingIndex].desc}
-                    </p>
-                  </div>
-
-                  <div className="absolute top-8 right-8 text-xs font-serif text-[#C9A86A] tracking-widest">
-                    {speakingIndex + 1} / {EVENTS.length}
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-          </section>
-
-          {/* 7. INTERACTIVE CHAT ASSISTANT */}
-          <section className="py-20 bg-white border-b border-[#E8E8E8]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-                
-                {/* Left Text */}
-                <div className="lg:col-span-5 space-y-6">
-                  <div className="inline-flex items-center gap-2 bg-[#C9A86A]/10 text-[#0D1B2A] px-3 py-1.5 text-xs font-bold uppercase tracking-wider">
-                    <Sparkles size={12} className="text-[#C9A86A]" /> Virtual Self-Consultation
-                  </div>
-                  <h2 className="font-serif text-3xl sm:text-4xl text-[#0D1B2A] font-light leading-snug">
-                    Ask Initial Questions About <br />
-                    <span className="italic text-[#C9A86A]">Our Clinic & Treatments</span>
-                  </h2>
-                  <p className="text-xs text-[#2D2D2D]/70 leading-relaxed font-light">
-                    Our intelligent assistant is ready to provide instant preliminary guidance on anxiety treatment routes, trauma recovery procedures, insurance, and Dr. Elena's practice schedule in London.
-                  </p>
-                </div>
-
-                {/* Right Chat Box */}
-                <div className="lg:col-span-7 bg-[#F8F5F0] border border-[#E8E8E8] shadow-sm flex flex-col h-[380px]">
-                  {/* Chat Header */}
-                  <div className="bg-[#0D1B2A] text-white px-5 py-4 flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-[#C9A86A] flex items-center justify-center font-serif text-xs text-[#0D1B2A] font-bold">
-                        EV
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold tracking-wider uppercase text-white">Dr. Elena's Concierge</p>
-                        <p className="text-[9px] text-emerald-400 flex items-center gap-1 uppercase tracking-widest">
-                          <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span> Online
+                        <h1 class="font-serif text-5xl sm:text-7xl lg:text-8xl text-primary leading-none font-light tracking-tight">
+                            DR. ELENA VELLA
+                        </h1>
+                        
+                        <p class="text-xs tracking-[0.3em] text-accent uppercase font-bold">
+                            CONSULTANT PSYCHIATRIST
                         </p>
-                      </div>
+                        
+                        <p class="text-dark/80 text-base max-w-md leading-relaxed font-light">
+                            Specializing in trauma recovery, anxiety disorders, burnout management, and adult mental health. Based in London with an integrative approach.
+                        </p>
+                        
+                        <!-- Action Buttons -->
+                        <div class="flex flex-wrap gap-4 pt-4">
+                            <button onclick="toggleBookingModal(true)" class="bg-primary text-white hover:bg-accent hover:text-primary px-8 py-4 text-xs tracking-widest uppercase font-bold transition-all duration-300 flex items-center gap-3 shadow-md hover:-translate-y-0.5 transform">
+                                Book Consultation <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                            </button>
+                            
+                            <button onclick="toggleVideoModal(true)" class="flex items-center gap-3 text-xs uppercase tracking-widest font-bold text-primary hover:text-accent transition-colors group">
+                                <span class="w-10 h-10 rounded-full border border-primary/20 flex items-center justify-center group-hover:border-accent transition-colors">
+                                    <i data-lucide="play" class="w-3 h-3 fill-current ml-0.5"></i>
+                                </span>
+                                Watch Intro
+                            </button>
+                        </div>
                     </div>
-                  </div>
 
-                  {/* Chat Body */}
-                  <div className="flex-grow p-4 overflow-y-auto space-y-3 flex flex-col text-xs">
-                    {aiChat.map((msg, idx) => (
-                      <div 
-                        key={idx} 
-                        className={`max-w-[85%] p-3 leading-relaxed ${
-                          msg.role === 'assistant' 
-                            ? 'bg-white text-[#2D2D2D] border border-[#E8E8E8] mr-auto' 
-                            : 'bg-[#0D1B2A] text-white ml-auto'
-                        }`}
-                      >
-                        {msg.text}
-                      </div>
-                    ))}
-                    {aiLoading && (
-                      <div className="bg-white text-[#2D2D2D] border border-[#E8E8E8] p-3 mr-auto flex items-center gap-1.5 animate-pulse">
-                        <span className="w-1 h-1 bg-[#C9A86A] rounded-full animate-bounce"></span>
-                        <span className="w-1 h-1 bg-[#C9A86A] rounded-full animate-bounce delay-100"></span>
-                        <span className="w-1 h-1 bg-[#C9A86A] rounded-full animate-bounce delay-200"></span>
-                        <span className="text-[10px] text-[#2D2D2D]/60 font-semibold">Formulating response...</span>
-                      </div>
-                    )}
-                  </div>
+                    <!-- Right Column: Elena's Photo & Floating Stats -->
+                    <div class="lg:col-span-6 relative animate-fadeIn animate-delay-100">
+                        <div class="relative mx-auto max-w-md lg:max-w-none">
+                            <div class="aspect-[4/5] bg-light relative overflow-hidden shadow-2xl">
+                                <img src="https://raw.githubusercontent.com/lengkongandreuw/drelena/main/heroimage1.png" alt="Dr. Elena Vella - Professional Portrait" class="absolute inset-0 w-full h-full object-cover object-center" />
+                            </div>
+                            <!-- Floating Stats Block -->
+                            <div class="bg-white p-6 sm:p-8 mt-6 border border-light shadow-lg grid grid-cols-2 sm:grid-cols-4 gap-6 relative z-20">
+                                <div class="space-y-1">
+                                    <p class="font-serif text-2xl text-primary font-light">12+</p>
+                                    <p class="text-[9px] text-dark/60 uppercase tracking-wider font-semibold leading-tight">Years Experience</p>
+                                </div>
+                                <div class="space-y-1 border-l border-light pl-4">
+                                    <p class="font-serif text-2xl text-primary font-light">4,000+</p>
+                                    <p class="text-[9px] text-dark/60 uppercase tracking-wider font-semibold leading-tight">Patient Consults</p>
+                                </div>
+                                <div class="space-y-1 border-l border-light pl-4">
+                                    <p class="font-serif text-2xl text-primary font-light">35+</p>
+                                    <p class="text-[9px] text-dark/60 uppercase tracking-wider font-semibold leading-tight">Publications</p>
+                                </div>
+                                <div class="space-y-1 border-l border-light pl-4">
+                                    <p class="font-serif text-2xl text-primary font-light">150+</p>
+                                    <p class="text-[9px] text-dark/60 uppercase tracking-wider font-semibold leading-tight">Workshops</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                  {/* Input Form */}
-                  <form onSubmit={handleAiMessage} className="p-3 bg-white border-t border-[#E8E8E8] flex gap-2">
-                    <input 
-                      type="text"
-                      placeholder="Type a question about costs, anxiety, ptsd, or schedules..."
-                      value={aiInput}
-                      onChange={(e) => setAiInput(e.target.value)}
-                      className="flex-grow border border-[#E8E8E8] px-3 py-2 text-xs focus:outline-none focus:border-[#C9A86A] bg-[#F8F5F0]"
-                    />
-                    <button 
-                      type="submit"
-                      className="bg-[#0D1B2A] text-white hover:bg-[#C9A86A] hover:text-[#0D1B2A] px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors"
-                    >
-                      Send
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. ABOUT PREVIEW SECTION -->
+        <section id="about" class="py-24 bg-base border-b border-light pt-28 -mt-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+                    
+                    <div class="lg:col-span-5 flex gap-8 items-stretch">
+                        <div class="hidden sm:block">
+                            <p class="text-[9px] uppercase tracking-[0.4em] text-accent font-bold origin-top-left transform rotate-90 whitespace-nowrap translate-x-4 mt-8">
+                                ABOUT DR. ELENA VELLA
+                            </p>
+                        </div>
+                        <div class="aspect-[3/4] bg-light relative overflow-hidden shadow-xl flex-grow">
+                            <img src="https://raw.githubusercontent.com/lengkongandreuw/drelena/main/heroimage2.png" alt="Dr. Elena Vella Consulting" class="absolute inset-0 w-full h-full object-cover object-center" />
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-7 space-y-6">
+                        <h2 class="font-serif text-3xl sm:text-5xl text-primary font-light leading-tight">
+                            People rarely break in an instant. <br />
+                            <span class="italic text-accent">They break slowly, in silence.</span>
+                        </h2>
+                        
+                        <p class="text-dark/85 text-base leading-relaxed font-light">
+                            I help individuals navigate the unseen emotional burdens that impact their mental well-being. My approach is collaborative, evidence-based, and intimately tailored to the human behind the story.
+                        </p>
+                        
+                        <div class="pt-4">
+                            <a href="#experience" class="text-xs uppercase tracking-widest font-bold text-primary hover:text-accent transition-colors flex items-center gap-2 group w-max">
+                                READ MY STORY <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. AREAS OF SPECIALIZATION SECTION -->
+        <section id="specializations" class="py-24 bg-white border-b border-light pt-28 -mt-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="flex justify-between items-end border-b border-light pb-6 mb-12">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-[0.2em] text-accent font-bold">CORE SPECIALIZATIONS</p>
+                        <h2 class="font-serif text-3xl sm:text-4xl text-primary font-light mt-1">Clinical Treatment Areas</h2>
+                    </div>
+                    <button onclick="toggleBookingModal(true)" class="text-xs uppercase tracking-widest font-bold text-primary hover:text-accent transition-colors flex items-center gap-2 group">
+                        VIEW ALL <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
                     </button>
-                  </form>
                 </div>
 
-              </div>
-            </div>
-          </section>
+                <!-- Generated via JS -->
+                <div id="specs-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Cards will be injected here -->
+                </div>
 
-          {/* 8. TESTIMONIALS SLIDER SECTION */}
-          <section className="py-24 bg-[#F8F5F0] text-center border-b border-[#E8E8E8] relative overflow-hidden">
-            <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-[#E8E8E8] -translate-y-1/2 select-none pointer-events-none z-0"></div>
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-              
-              <div className="bg-white p-12 sm:p-16 border border-[#E8E8E8] shadow-sm space-y-6 relative">
-                <span className="text-7xl text-[#C9A86A]/40 font-serif leading-none select-none">“</span>
+            </div>
+        </section>
+
+        <!-- 4. MY JOURNEY -->
+        <section id="experience" class="py-24 bg-base border-b border-light pt-28 -mt-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 
-                <p className="font-serif text-xl sm:text-3xl font-light italic text-[#0D1B2A] max-w-2xl mx-auto leading-relaxed -mt-6">
-                  {TESTIMONIALS[currentTestimonial].quote}
+                <div class="flex justify-between items-end border-b border-light pb-6 mb-16">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-[0.2em] text-accent font-bold">CAREER TIMELINE</p>
+                        <h2 class="font-serif text-3xl sm:text-4xl text-primary font-light mt-1">Clinical & Research Journey</h2>
+                    </div>
+                    <a href="#research" class="text-xs uppercase tracking-widest font-bold text-primary hover:text-accent transition-colors flex items-center gap-2 group">
+                        SEE FULL EXPERIENCE <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+
+                <div class="relative mb-12">
+                    <div class="absolute top-1/2 left-0 right-0 h-[1.5px] bg-light -translate-y-1/2 hidden md:block"></div>
+                    <div id="timeline-nav" class="grid grid-cols-1 md:grid-cols-5 gap-6 relative z-10">
+                        <!-- Timeline buttons injected here -->
+                    </div>
+                </div>
+
+                <!-- Active Year Detail Box -->
+                <div class="bg-white p-8 sm:p-12 border border-light shadow-sm relative overflow-hidden transition-all duration-500 min-h-[220px] flex flex-col justify-between">
+                    <div id="timeline-bg-year" class="absolute right-6 top-0 font-serif text-[12rem] text-accent/5 font-bold leading-none select-none pointer-events-none"></div>
+                    
+                    <div class="space-y-4 relative z-10 animate-fadeIn" id="timeline-content">
+                        <div class="inline-block bg-primary text-accent text-[10px] font-bold uppercase tracking-widest px-3 py-1">
+                            Era <span id="timeline-year"></span>
+                        </div>
+                        <h3 id="timeline-role" class="font-serif text-2xl sm:text-3xl text-primary font-light"></h3>
+                        <p id="timeline-inst" class="text-xs text-accent uppercase tracking-widest font-semibold"></p>
+                        <p id="timeline-desc" class="text-sm text-dark/80 leading-relaxed font-light max-w-2xl"></p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5. RESEARCH & PUBLICATIONS SECTION -->
+        <section id="research" class="py-24 bg-white border-b border-light pt-28 -mt-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="flex justify-between items-end border-b border-light pb-6 mb-12">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-[0.2em] text-accent font-bold">RESEARCH LIBRARY</p>
+                        <h2 class="font-serif text-3xl sm:text-4xl text-primary font-light mt-1">Scientific Journals & Publications</h2>
+                    </div>
+                    <button onclick="resetResearchFilters()" class="text-xs uppercase tracking-widest font-bold text-primary hover:text-accent transition-colors flex items-center gap-2 group">
+                        VIEW ALL PUBLICATIONS <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </div>
+
+                <!-- Search & Filter Controls -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-8">
+                    <div class="md:col-span-6 relative">
+                        <i data-lucide="search" class="absolute left-3 top-3 text-dark/40 w-4 h-4"></i>
+                        <input type="text" id="research-search" placeholder="Search research by title..." class="w-full bg-base border border-light pl-10 pr-4 py-2.5 text-xs focus:outline-none focus:border-accent transition-all" />
+                    </div>
+                    <div id="research-filters" class="md:col-span-6 flex flex-wrap gap-2 justify-start md:justify-end">
+                        <!-- Filters injected here -->
+                    </div>
+                </div>
+
+                <!-- Publication Cards -->
+                <div id="research-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Cards injected here -->
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 6. SPEAKING & TEACHING SECTION -->
+        <section id="speaking" class="py-24 bg-[#0F1B2A] text-white overflow-hidden relative pt-28 -mt-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                
+                <div class="border-b border-white/10 pb-6 mb-12 flex justify-between items-end">
+                    <div>
+                        <p class="text-[10px] uppercase tracking-[0.2em] text-accent font-bold">PUBLIC PRESENTATIONS</p>
+                        <h2 class="font-serif text-3xl sm:text-4xl text-white font-light mt-1">Education & International Symposia</h2>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="prevSpeaking()" class="w-10 h-10 border border-white/20 hover:border-accent flex items-center justify-center transition-colors text-white hover:text-accent">
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="nextSpeaking()" class="w-10 h-10 border border-white/20 hover:border-accent flex items-center justify-center transition-colors text-white hover:text-accent">
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                    <div class="lg:col-span-4 bg-[#152e47] p-8 sm:p-10 flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <p class="text-[10px] uppercase tracking-widest text-accent font-semibold">Speaking & Teaching</p>
+                            <h3 class="font-serif text-2xl text-white font-light leading-snug">
+                                Keynote speaker for clinical symposia, corporate leadership, and global health media.
+                            </h3>
+                        </div>
+                        <div class="pt-8">
+                            <button onclick="openBookingWithReason('Speaking Invitation')" class="text-xs uppercase tracking-widest font-bold text-accent hover:text-white flex items-center gap-2 transition-colors">
+                                SEND INVITATION <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Active Slide Card -->
+                    <div class="lg:col-span-8 relative min-h-[350px] bg-gradient-to-r from-[#1c324b] to-[#0F1B2A] border border-white/10 overflow-hidden flex flex-col justify-end p-8 sm:p-12">
+                        <img id="spk-img" src="" alt="Speaking Event" class="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay transition-opacity duration-300" />
+
+                        <div class="space-y-4 relative z-10 animate-fadeIn" id="spk-content">
+                            <span id="spk-date" class="text-xs uppercase tracking-widest text-accent font-bold"></span>
+                            <h3 id="spk-title" class="font-serif text-3xl sm:text-4xl text-white font-light"></h3>
+                            <p id="spk-desc" class="text-sm text-light/70 leading-relaxed font-light max-w-xl"></p>
+                        </div>
+
+                        <div id="spk-counter" class="absolute top-8 right-8 text-xs font-serif text-accent tracking-widest"></div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 7. INTERACTIVE CHAT ASSISTANT -->
+        <section class="py-20 bg-white border-b border-light pt-28 -mt-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    
+                    <div class="lg:col-span-5 space-y-6">
+                        <div class="inline-flex items-center gap-2 bg-accent/10 text-primary px-3 py-1.5 text-xs font-bold uppercase tracking-wider">
+                            <i data-lucide="sparkles" class="w-3 h-3 text-accent"></i> Virtual Self-Consultation
+                        </div>
+                        <h2 class="font-serif text-3xl sm:text-4xl text-primary font-light leading-snug">
+                            Ask Initial Questions About <br />
+                            <span class="italic text-accent">Our Clinic & Treatments</span>
+                        </h2>
+                        <p class="text-xs text-dark/70 leading-relaxed font-light">
+                            Our intelligent assistant is ready to provide instant preliminary guidance on anxiety treatment routes, trauma recovery procedures, insurance, and Dr. Elena's practice schedule in London.
+                        </p>
+                    </div>
+
+                    <div class="lg:col-span-7 bg-base border border-light shadow-sm flex flex-col h-[380px]">
+                        <div class="bg-primary text-white px-5 py-4 flex items-center justify-between">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center font-serif text-xs text-primary font-bold">EV</div>
+                                <div>
+                                    <p class="text-xs font-bold tracking-wider uppercase text-white">Dr. Elena's Concierge</p>
+                                    <p class="text-[9px] text-emerald-400 flex items-center gap-1 uppercase tracking-widest">
+                                        <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span> Online
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="chat-box" class="flex-grow p-4 overflow-y-auto space-y-3 flex flex-col text-xs">
+                            <!-- Messages injected here -->
+                        </div>
+
+                        <form id="chat-form" class="p-3 bg-white border-t border-light flex gap-2">
+                            <input type="text" id="chat-input" placeholder="Type a question about costs, anxiety, ptsd..." class="flex-grow border border-light px-3 py-2 text-xs focus:outline-none focus:border-accent bg-base" />
+                            <button type="submit" class="bg-primary text-white hover:bg-accent hover:text-primary px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors">Send</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. TESTIMONIALS SLIDER SECTION -->
+        <section class="py-24 bg-base text-center border-b border-light relative overflow-hidden">
+            <div class="absolute top-1/2 left-0 right-0 h-[1px] bg-light -translate-y-1/2 select-none pointer-events-none z-0"></div>
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                
+                <div class="bg-white p-12 sm:p-16 border border-light shadow-sm space-y-6 relative">
+                    <span class="text-7xl text-accent/40 font-serif leading-none select-none">“</span>
+                    
+                    <p id="testi-quote" class="font-serif text-xl sm:text-3xl font-light italic text-primary max-w-2xl mx-auto leading-relaxed -mt-6 transition-opacity duration-300"></p>
+
+                    <div class="pt-4 space-y-1 border-t border-light/60 max-w-xs mx-auto">
+                        <h5 id="testi-author" class="font-bold text-xs tracking-widest text-primary uppercase"></h5>
+                        <p id="testi-role" class="text-[10px] text-dark/60 uppercase tracking-widest font-semibold"></p>
+                    </div>
+
+                    <div id="testi-nav" class="flex justify-center gap-3 pt-6">
+                        <!-- Dots injected here -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 9. BOTTOM CALL-TO-ACTION -->
+        <section id="contact" class="bg-gradient-to-br from-[#0D1B2A] to-[#152e47] text-white py-28 text-center border-t border-accent/40 relative overflow-hidden pt-36 -mt-12">
+            <div class="absolute -right-20 -bottom-20 w-96 h-96 rounded-full bg-accent/5 blur-3xl"></div>
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 relative z-10">
+                
+                <h2 class="font-serif text-4xl sm:text-6xl font-light leading-tight">
+                    You don't have to face this alone. <br />
+                    <span class="italic text-accent font-normal">Empathetic help is here.</span>
+                </h2>
+
+                <div class="pt-4 flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <button onclick="toggleBookingModal(true)" class="bg-accent text-primary hover:bg-white hover:text-primary px-10 py-5 text-xs font-bold tracking-widest uppercase transition-all duration-300 shadow-xl hover:-translate-y-0.5 transform">
+                        BOOK CONSULTATION →
+                    </button>
+                </div>
+
+                <p class="text-xs text-light/70 tracking-widest uppercase">
+                    Or email us directly at <a href="mailto:hello@drelenavella.com" class="text-accent hover:underline font-bold">hello@drelenavella.com</a>
                 </p>
 
-                <div className="pt-4 space-y-1 border-t border-[#E8E8E8]/60 max-w-xs mx-auto">
-                  <h5 className="font-bold text-xs tracking-widest text-[#0D1B2A] uppercase">
-                    {TESTIMONIALS[currentTestimonial].author}
-                  </h5>
-                  <p className="text-[10px] text-[#2D2D2D]/60 uppercase tracking-widest font-semibold">
-                    {TESTIMONIALS[currentTestimonial].role}
-                  </p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- --- FOOTER --- -->
+    <footer class="bg-primary text-white border-t border-white/15">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-white/10 pb-12">
+                <div class="space-y-4 col-span-1 md:col-span-2">
+                    <span class="font-serif text-xl tracking-[0.1em] text-white block">DR. ELENA MARIE VELLA</span>
+                    <p class="text-[10px] text-light/60 tracking-widest uppercase font-bold">CONSULTANT PSYCHIATRIST</p>
+                    <p class="text-xs text-light/70 leading-relaxed font-light max-w-sm">
+                        Harley Street Medical Hub, London, United Kingdom. Providing highly confidential, personalized medical consultation services.
+                    </p>
                 </div>
-
-                {/* Slider Navigation */}
-                <div className="flex justify-center gap-3 pt-6">
-                  {TESTIMONIALS.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setCurrentTestimonial(i)}
-                      className={`h-[3px] transition-all duration-500 rounded-none ${
-                        currentTestimonial === i ? 'w-10 bg-[#C9A86A]' : 'w-3 bg-[#2D2D2D]/20 hover:bg-[#2D2D2D]/40'
-                      }`}
-                      aria-label={`Slide Testimonial ${i + 1}`}
-                    ></button>
-                  ))}
+                <div class="space-y-4">
+                    <h4 class="text-[10px] uppercase tracking-widest text-accent font-bold">Quick Links</h4>
+                    <ul class="space-y-2.5 text-xs text-light/70 font-light">
+                        <li><a href="#about" class="hover:text-accent transition-colors">About</a></li>
+                        <li><a href="#experience" class="hover:text-accent transition-colors">Experience</a></li>
+                        <li><a href="#specializations" class="hover:text-accent transition-colors">Specializations</a></li>
+                        <li><a href="#research" class="hover:text-accent transition-colors">Research</a></li>
+                        <li><a href="#speaking" class="hover:text-accent transition-colors">Speaking</a></li>
+                        <li><a href="#contact" class="hover:text-accent transition-colors">Contact</a></li>
+                    </ul>
                 </div>
-              </div>
-
+                <div class="space-y-4">
+                    <h4 class="text-[10px] uppercase tracking-widest text-accent font-bold">Connect</h4>
+                    <ul class="space-y-2 text-xs text-light/70 font-light">
+                        <li class="flex items-center gap-2"><i data-lucide="phone" class="w-3 h-3 text-accent"></i> +44 20 7946 0956</li>
+                        <li class="flex items-center gap-2"><i data-lucide="mail" class="w-3 h-3 text-accent"></i> hello@drelenavella.com</li>
+                        <li class="text-[9px] text-light/40 uppercase tracking-widest font-bold pt-2 border-t border-white/5 mt-2">
+                            GMC Ref: 7592038 • GMC Registered
+                        </li>
+                    </ul>
+                </div>
             </div>
-          </section>
-
-          {/* 9. BOTTOM CALL-TO-ACTION */}
-          <section className="bg-gradient-to-br from-[#0D1B2A] to-[#152e47] text-white py-28 text-center border-t border-[#C9A86A]/40 relative overflow-hidden">
-            <div className="absolute -right-20 -bottom-20 w-96 h-96 rounded-full bg-[#C9A86A]/5 blur-3xl"></div>
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 relative z-10">
-              
-              <h2 className="font-serif text-4xl sm:text-6xl font-light leading-tight">
-                You don't have to face this alone. <br />
-                <span className="italic text-[#C9A86A] font-normal">Empathetic help is here.</span>
-              </h2>
-
-              <div className="pt-4 flex flex-col sm:flex-row justify-center items-center gap-4">
-                <button 
-                  onClick={() => setShowBookingModal(true)}
-                  className="bg-[#C9A86A] text-[#0D1B2A] hover:bg-white hover:text-[#0D1B2A] px-10 py-5 text-xs font-bold tracking-widest uppercase transition-all duration-300 shadow-xl hover:-translate-y-0.5 transform"
-                >
-                  BOOK CONSULTATION →
-                </button>
-              </div>
-
-              <p className="text-xs text-[#E8E8E8]/70 tracking-widest uppercase">
-                Or email us directly at <a href="mailto:hello@drelenavella.com" className="text-[#C9A86A] hover:underline font-bold">hello@drelenavella.com</a>
-              </p>
-
+            <div class="pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-light/50 space-y-4 sm:space-y-0">
+                <p>© 2026 Dr. Elena Marie Vella. All rights reserved.</p>
+                <div class="flex gap-4">
+                    <button onclick="alert('Medical Privacy Policy documentation compliant with HIPAA & GDPR.')" class="hover:text-accent">Privacy Policy</button>
+                    <span>•</span>
+                    <button onclick="alert('Specialist Doctor Practice Terms and Conditions.')" class="hover:text-accent">Terms of Use</button>
+                </div>
             </div>
-          </section>
-
         </div>
+    </footer>
 
-      </main>
-
-      {/* --- FOOTER --- */}
-      <footer className="bg-[#0D1B2A] text-white border-t border-white/15">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-white/10 pb-12">
-            
-            {/* Doctor Info */}
-            <div className="space-y-4 col-span-1 md:col-span-2">
-              <span className="font-serif text-xl tracking-[0.1em] text-white block">
-                DR. ELENA MARIE VELLA
-              </span>
-              <p className="text-[10px] text-[#E8E8E8]/60 tracking-widest uppercase font-bold">
-                CONSULTANT PSYCHIATRIST
-              </p>
-              <p className="text-xs text-[#E8E8E8]/70 leading-relaxed font-light max-w-sm">
-                Harley Street Medical Hub, London, United Kingdom. Providing highly confidential, personalized medical consultation services.
-              </p>
-            </div>
-
-            {/* Quick Links */}
-            <div className="space-y-4">
-              <h4 className="text-[10px] uppercase tracking-widest text-[#C9A86A] font-bold">Quick Links</h4>
-              <ul className="space-y-2.5 text-xs text-[#E8E8E8]/70 font-light">
-                {['About', 'Experience', 'Specializations', 'Research', 'Speaking', 'Contact'].map((item) => (
-                  <li key={item}>
-                    <a 
-                      href={`#${item.toLowerCase()}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        const el = document.getElementById(item.toLowerCase());
-                        if (el) el.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                      className="hover:text-[#C9A86A] transition-colors"
-                    >
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Resources & Contact */}
-            <div className="space-y-4">
-              <h4 className="text-[10px] uppercase tracking-widest text-[#C9A86A] font-bold">Connect</h4>
-              <ul className="space-y-2 text-xs text-[#E8E8E8]/70 font-light">
-                <li className="flex items-center gap-2"><Phone size={12} className="text-[#C9A86A]" /> +44 20 7946 0956</li>
-                <li className="flex items-center gap-2"><Mail size={12} className="text-[#C9A86A]" /> hello@drelenavella.com</li>
-                <li className="text-[9px] text-[#E8E8E8]/40 uppercase tracking-widest font-bold pt-2 border-t border-white/5 mt-2">
-                  GMC Ref: 7592038 • GMC Registered Specialist
-                </li>
-              </ul>
-            </div>
-
-          </div>
-
-          {/* Copyright */}
-          <div className="pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-[#E8E8E8]/50 space-y-4 sm:space-y-0">
-            <p>© 2026 Dr. Elena Marie Vella. All rights reserved.</p>
-            <div className="flex gap-4">
-              <button onClick={() => alert("Medical Privacy Policy documentation compliant with HIPAA & GDPR.")} className="hover:text-[#C9A86A]">Privacy Policy</button>
-              <span>•</span>
-              <button onClick={() => alert("Specialist Doctor Practice Terms and Conditions.")} className="hover:text-[#C9A86A]">Terms of Use</button>
-            </div>
-          </div>
-        </div>
-      </footer>
-
-      {/* --- INTRO VIDEO MODAL DIALOG --- */}
-      {showVideoModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0F1B2A] max-w-2xl w-full p-6 sm:p-8 border border-white/10 relative">
-            <button 
-              onClick={() => setShowVideoModal(false)}
-              className="absolute top-4 right-4 text-white hover:text-[#C9A86A] transition-colors"
-            >
-              <X size={20} />
+    <!-- --- MODALS --- -->
+    <!-- Video Modal -->
+    <div id="video-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm items-center justify-center z-50 p-4">
+        <div class="bg-[#0F1B2A] max-w-2xl w-full p-6 sm:p-8 border border-white/10 relative">
+            <button onclick="toggleVideoModal(false)" class="absolute top-4 right-4 text-white hover:text-accent transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
             </button>
-            
-            <div className="space-y-4">
-              <span className="text-[10px] uppercase tracking-widest text-[#C9A86A] font-bold">INTRODUCTORY VIDEO</span>
-              <h3 className="font-serif text-2xl text-white font-light">Diving into Comparative Therapy Philosophy</h3>
-              
-              {/* Representative Video Box */}
-              <div className="aspect-video bg-black/60 flex flex-col items-center justify-center border border-white/5 text-center p-6 space-y-4 relative">
-                <div className="w-16 h-16 rounded-full border border-[#C9A86A] flex items-center justify-center text-[#C9A86A] animate-pulse">
-                  <Play size={20} className="fill-current ml-1" />
+            <div class="space-y-4">
+                <span class="text-[10px] uppercase tracking-widest text-accent font-bold">INTRODUCTORY VIDEO</span>
+                <h3 class="font-serif text-2xl text-white font-light">Diving into Comparative Therapy Philosophy</h3>
+                <div class="aspect-video bg-black/60 flex flex-col items-center justify-center border border-white/5 text-center p-6 space-y-4 relative">
+                    <div class="w-16 h-16 rounded-full border border-accent flex items-center justify-center text-accent animate-pulse">
+                        <i data-lucide="play" class="w-5 h-5 fill-current ml-1"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-white/80">Simulated Playback of Dr. Elena Marie Vella's Profile Video</p>
+                        <p class="text-[10px] text-white/40 mt-1">Duration: 2 Minutes 45 Seconds</p>
+                    </div>
                 </div>
-                <div>
-                  <p className="text-xs text-white/80">Simulated Playback of Dr. Elena Marie Vella's Profile Video</p>
-                  <p className="text-[10px] text-white/40 mt-1">Duration: 2 Minutes 45 Seconds</p>
-                </div>
-              </div>
-
-              <p className="text-xs text-white/70 leading-relaxed font-light">
-                In this introductory video, Dr. Elena explains how past trauma is directly tied to tension in the body's motor nervous system, as well as applied somatic handling techniques.
-              </p>
+                <p class="text-xs text-white/70 leading-relaxed font-light">
+                    In this introductory video, Dr. Elena explains how past trauma is directly tied to tension in the body's motor nervous system, as well as applied somatic handling techniques.
+                </p>
             </div>
-          </div>
         </div>
-      )}
-
-      {/* --- SECURE BOOKING FORM MODAL --- */}
-      {showBookingModal && (
-        <div className="fixed inset-0 bg-[#0D1B2A]/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-white max-w-lg w-full p-8 border border-[#E8E8E8] relative shadow-2xl mt-12 sm:mt-0">
-            <button 
-              onClick={() => {
-                setShowBookingModal(false);
-                setIsSubmitted(false);
-              }}
-              className="absolute top-6 right-6 text-[#0D1B2A] hover:text-[#C9A86A] transition-colors"
-            >
-              <X size={20} />
-            </button>
-
-            {isSubmitted ? (
-              <div className="text-center py-8 space-y-6 animate-fadeIn">
-                <div className="w-14 h-14 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
-                  ✓
-                </div>
-                <div className="space-y-2">
-                  <h3 className="font-serif text-2xl text-[#0D1B2A] font-light">Registration Securely Sent</h3>
-                  <p className="text-xs text-[#2D2D2D]/75 leading-relaxed max-w-xs mx-auto">
-                    Thank you, <strong>{bookingForm.name}</strong>. Our practice manager will contact you within 24 business hours to verify your consultation time slot.
-                  </p>
-                </div>
-                <button
-                  onClick={() => {
-                    setIsSubmitted(false);
-                    setShowBookingModal(false);
-                  }}
-                  className="bg-[#0D1B2A] text-white hover:bg-[#C9A86A] px-6 py-2.5 text-xs font-bold uppercase tracking-widest transition-colors mt-4"
-                >
-                  Close Portal
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleBookingSubmit} className="space-y-4">
-                <div className="space-y-1">
-                  <span className="text-[9px] uppercase tracking-widest text-[#C9A86A] font-bold">SECURE PORTAL</span>
-                  <h3 className="font-serif text-2xl text-[#0D1B2A] font-light">Contact & Consultation Form</h3>
-                </div>
-
-                <div className="space-y-3 pt-2">
-                  <div className="space-y-1">
-                    <label className="text-[9px] uppercase tracking-wider font-bold text-[#2D2D2D]/60">Full Name *</label>
-                    <input 
-                      type="text"
-                      required
-                      value={bookingForm.name}
-                      onChange={(e) => setBookingForm({...bookingForm, name: e.target.value})}
-                      placeholder="Enter your legal name"
-                      className="w-full bg-[#F8F5F0] border border-[#E8E8E8] px-3.5 py-2.5 text-xs focus:outline-none focus:border-[#C9A86A]"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label className="text-[9px] uppercase tracking-wider font-bold text-[#2D2D2D]/60">Email Address *</label>
-                      <input 
-                        type="email"
-                        required
-                        value={bookingForm.email}
-                        onChange={(e) => setBookingForm({...bookingForm, email: e.target.value})}
-                        placeholder="name@email.com"
-                        className="w-full bg-[#F8F5F0] border border-[#E8E8E8] px-3.5 py-2.5 text-xs focus:outline-none focus:border-[#C9A86A]"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-[9px] uppercase tracking-wider font-bold text-[#2D2D2D]/60">Service Category *</label>
-                      <select 
-                        value={bookingForm.reason}
-                        onChange={(e) => setBookingForm({...bookingForm, reason: e.target.value})}
-                        className="w-full bg-[#F8F5F0] border border-[#E8E8E8] px-3.5 py-2.5 text-xs focus:outline-none focus:border-[#C9A86A]"
-                      >
-                        <option value="Clinical Consultation">Main Consultation (Trauma/Anxiety)</option>
-                        <option value="Research Collaboration">Academic Research Collaboration</option>
-                        <option value="Speaking Invitation">Seminar / Workshop Invitation</option>
-                        <option value="General Inquiry">Other General Inquiries</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-[9px] uppercase tracking-wider font-bold text-[#2D2D2D]/60">Brief Message / Concern *</label>
-                    <textarea 
-                      required
-                      rows="3"
-                      value={bookingForm.message}
-                      onChange={(e) => setBookingForm({...bookingForm, message: e.target.value})}
-                      placeholder="Briefly state your clinical or academic needs in strict confidence..."
-                      className="w-full bg-[#F8F5F0] border border-[#E8E8E8] px-3.5 py-2.5 text-xs focus:outline-none focus:border-[#C9A86A]"
-                    ></textarea>
-                  </div>
-
-                  <label className="flex items-start gap-2.5 cursor-pointer pt-2">
-                    <input 
-                      type="checkbox"
-                      required
-                      checked={bookingForm.consent}
-                      onChange={(e) => setBookingForm({...bookingForm, consent: e.target.checked})}
-                      className="mt-0.5 rounded border-[#E8E8E8] text-[#C9A86A] focus:ring-[#C9A86A]"
-                    />
-                    <span className="text-[10px] text-[#2D2D2D]/70 font-light leading-tight">
-                      I give my confidential clinical consent to the transmission of my data in accordance with GMC medical privacy protection laws.
-                    </span>
-                  </label>
-                </div>
-
-                <div className="pt-4">
-                  <button 
-                    type="submit"
-                    className="w-full bg-[#0D1B2A] text-white hover:bg-[#C9A86A] hover:text-[#0D1B2A] py-3.5 text-xs font-bold uppercase tracking-widest transition-colors shadow-md"
-                  >
-                    Send Consultation Request
-                  </button>
-                </div>
-              </form>
-            )}
-
-          </div>
-        </div>
-      )}
-
     </div>
-  );
-}
+
+    <!-- Booking Modal -->
+    <div id="booking-modal" class="hidden fixed inset-0 bg-primary/70 backdrop-blur-sm items-center justify-center z-50 p-4 overflow-y-auto">
+        <div class="bg-white max-w-lg w-full p-8 border border-light relative shadow-2xl mt-12 sm:mt-0">
+            <button onclick="toggleBookingModal(false)" class="absolute top-6 right-6 text-primary hover:text-accent transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <div id="booking-success" class="hidden text-center py-8 space-y-6 animate-fadeIn">
+                <div class="w-14 h-14 bg-emerald-50 text-emerald-600 border border-emerald-200 rounded-full flex items-center justify-center mx-auto text-xl font-bold">✓</div>
+                <div class="space-y-2">
+                    <h3 class="font-serif text-2xl text-primary font-light">Registration Securely Sent</h3>
+                    <p class="text-xs text-dark/75 leading-relaxed max-w-xs mx-auto">
+                        Thank you. Our practice manager will contact you within 24 business hours to verify your consultation time slot.
+                    </p>
+                </div>
+                <button onclick="toggleBookingModal(false)" class="bg-primary text-white hover:bg-accent px-6 py-2.5 text-xs font-bold uppercase tracking-widest transition-colors mt-4">Close Portal</button>
+            </div>
+
+            <form id="booking-form" class="space-y-4">
+                <div class="space-y-1">
+                    <span class="text-[9px] uppercase tracking-widest text-accent font-bold">SECURE PORTAL</span>
+                    <h3 class="font-serif text-2xl text-primary font-light">Contact & Consultation Form</h3>
+                </div>
+                <div class="space-y-3 pt-2">
+                    <div class="space-y-1">
+                        <label class="text-[9px] uppercase tracking-wider font-bold text-dark/60">Full Name *</label>
+                        <input type="text" required placeholder="Enter your legal name" class="w-full bg-base border border-light px-3.5 py-2.5 text-xs focus:outline-none focus:border-accent">
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="space-y-1">
+                            <label class="text-[9px] uppercase tracking-wider font-bold text-dark/60">Email Address *</label>
+                            <input type="email" required placeholder="name@email.com" class="w-full bg-base border border-light px-3.5 py-2.5 text-xs focus:outline-none focus:border-accent">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[9px] uppercase tracking-wider font-bold text-dark/60">Service Category *</label>
+                            <select id="booking-reason" class="w-full bg-base border border-light px-3.5 py-2.5 text-xs focus:outline-none focus:border-accent">
+                                <option value="Clinical Consultation">Main Consultation</option>
+                                <option value="Research Collaboration">Academic Research</option>
+                                <option value="Speaking Invitation">Seminar Invitation</option>
+                                <option value="General Inquiry">Other Inquiries</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] uppercase tracking-wider font-bold text-dark/60">Brief Message / Concern *</label>
+                        <textarea id="booking-message" required rows="3" placeholder="Briefly state your clinical or academic needs in strict confidence..." class="w-full bg-base border border-light px-3.5 py-2.5 text-xs focus:outline-none focus:border-accent"></textarea>
+                    </div>
+                    <label class="flex items-start gap-2.5 cursor-pointer pt-2">
+                        <input type="checkbox" required class="mt-0.5 rounded border-light text-accent focus:ring-accent">
+                        <span class="text-[10px] text-dark/70 font-light leading-tight">
+                            I give my confidential clinical consent to the transmission of my data in accordance with GMC medical privacy protection laws.
+                        </span>
+                    </label>
+                </div>
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-primary text-white hover:bg-accent hover:text-primary py-3.5 text-xs font-bold uppercase tracking-widest transition-colors shadow-md">
+                        Send Consultation Request
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // --- DATA ---
+        const SPECIALIZATIONS = [
+            { id: 'trauma', title: 'Trauma & PTSD', icon: '✨', desc: 'Deep psychological recovery from past trauma using advanced somatic integration.' },
+            { id: 'anxiety', title: 'Anxiety Disorders', icon: '🧘', desc: 'Comprehensive therapy for panic attacks, social anxiety, and autonomic regulation.' },
+            { id: 'depression', title: 'Clinical Depression', icon: '🌱', desc: 'Holistic medical assessment and personalized affective recovery planning.' },
+            { id: 'burnout', title: 'Burnout Management', icon: '⏳', desc: 'Specialized cognitive recovery programs for high-performing professionals.' },
+            { id: 'adult-mental', title: 'Adult Mental Health', icon: '🤝', desc: 'Thorough diagnostic evaluation for adult neuropsychiatric challenges.' },
+            { id: 'stress', title: 'Stress Disorders', icon: '🔥', desc: 'Restructuring the nervous system\'s adaptive responses to chronic pressure.' },
+            { id: 'crisis', title: 'Crisis Psychiatry', icon: '🛡️', desc: 'Acute emergency interventions that are safe, structured, and secure.' },
+            { id: 'recovery', title: 'Recovery Programs', icon: '🔄', desc: 'Sustainable, long-term psychiatric rehabilitation and care plans.' }
+        ];
+
+        const JOURNEY = [
+            { year: '2016', role: 'Medical Internship', institution: 'Mater Dei Hospital, Malta', desc: 'Started formal clinical rotations post-graduation in acute and emergency medical units.' },
+            { year: '2017', role: 'Junior Doctor', institution: 'Mater Dei Mental Health Services', desc: 'Initial focus on acute psychiatric ward care and biological protocols.' },
+            { year: '2018', role: 'Psychiatry Registrar', institution: 'South London and Maudsley NHS Trust', desc: 'Intensive psychiatric specialization in the UK\'s leading mental health referral center.' },
+            { year: '2020', role: 'Senior Registrar', institution: 'King\'s College London / NHS', desc: 'Led clinical trials for somatic trauma therapy and supervised psychiatry residents.' },
+            { year: '2023', role: 'Consultant Psychiatrist', institution: 'Private Practice & NHS Consultant, London', desc: 'Opened a specialist clinic for trauma, executive burnout, and premium psychiatry.' }
+        ];
+
+        const PUBLICATIONS = [
+            { id: 'pub-1', category: 'Research Paper', year: '2024', journal: 'Journal of Affective Disorders', title: 'The Long-Term Impact of Childhood Trauma on Emotional Regulation', summary: 'Empirical evaluation of the impact of childhood trauma on adult emotional stability.', citation: 'Vella, E. M. (2024). The Long-Term Impact of Childhood Trauma on Emotional Regulation. Journal of Affective Disorders, 312, 145-159.' },
+            { id: 'pub-2', category: 'Clinical Study', year: '2023', journal: 'BMC Psychiatry', title: 'Burnout in Healthcare Professionals: A Cross-Sectional Analysis', summary: 'Comprehensive study on prefrontal fatigue levels in medical staff during post-pandemic recovery.', citation: 'Vella, E. M. (2023). Burnout in Healthcare Professionals: A Cross-Sectional Analysis. BMC Psychiatry, 23(1), 89-102.' },
+            { id: 'pub-3', category: 'Review', year: '2021', journal: 'The Lancet Psychiatry', title: 'Anxiety Disorders in Adults: Evidence-Based Treatment Approaches', summary: 'Critical review of pharmacotherapy protocols and psychosocial integration in managing acute anxiety.', citation: 'Vella, E. M. (2021). Anxiety Disorders in Adults: Evidence-Based Treatment Approaches. The Lancet Psychiatry, 8(4), 312-325.' }
+        ];
+
+        const EVENTS = [
+            { title: 'London Mental Health Summit', date: 'May 2024', image: 'https://raw.githubusercontent.com/lengkongandreuw/drelena/main/heroimage2.png', desc: 'Presentation of cutting-edge somatic integration methods for complex PTSD treatment.' },
+            { title: 'The Future of Psychiatry Conference', date: 'October 2023', image: 'https://raw.githubusercontent.com/lengkongandreuw/drelena/main/heroimage1.png', desc: 'Panel discussion on the future of autonomic regulation in treating anxiety disorders.' },
+            { title: 'Trauma-Informed Care Workshop', date: 'June 2023', image: 'https://raw.githubusercontent.com/lengkongandreuw/drelena/main/heroimage2.png', desc: 'Clinical workshop for medical practitioners on trauma-informed approaches.' }
+        ];
+
+        const TESTIMONIALS = [
+            { quote: "Her calm approach and deep understanding helped me rebuild my confidence after years of severe anxiety.", author: "ANONYMOUS PATIENT", role: "Financial Professional, London" },
+            { quote: "Dr. Elena provided an incredibly safe space for me to process past trauma that had hindered my career and relationships.", author: "ANONYMOUS PATIENT", role: "Senior Academic" },
+            { quote: "Private consulting sessions with Dr. Elena are the best mental health investment I've ever made. She is highly authoritative yet full of empathy.", author: "ANONYMOUS PATIENT", role: "Executive Director" }
+        ];
+
+        // --- MOBILE MENU ---
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('mobile-menu').classList.add('hidden');
+            });
+        });
+
+        // --- MODALS ---
+        function toggleVideoModal(show) {
+            document.getElementById('video-modal').style.display = show ? 'flex' : 'none';
+        }
+        function toggleBookingModal(show) {
+            document.getElementById('booking-modal').style.display = show ? 'flex' : 'none';
+            if(!show) {
+                document.getElementById('booking-form').style.display = 'block';
+                document.getElementById('booking-success').style.display = 'none';
+            }
+        }
+        function openBookingWithReason(reason, message = '') {
+            document.getElementById('booking-reason').value = reason;
+            document.getElementById('booking-message').value = message;
+            toggleBookingModal(true);
+        }
+        document.getElementById('booking-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            document.getElementById('booking-form').style.display = 'none';
+            document.getElementById('booking-success').style.display = 'block';
+        });
+
+        // --- SPECIALIZATIONS ---
+        const specsGrid = document.getElementById('specs-grid');
+        SPECIALIZATIONS.forEach(spec => {
+            specsGrid.innerHTML += `
+                <div class="p-8 border border-light hover:border-accent hover:shadow-lg transition-all duration-300 flex flex-col justify-between min-h-[220px] group cursor-pointer" onclick="openBookingWithReason('Clinical Consultation', 'I would like to schedule an initial consultation regarding: ${spec.title}')">
+                    <div class="space-y-4">
+                        <div class="text-3xl text-accent filter grayscale group-hover:grayscale-0 transition-all">${spec.icon}</div>
+                        <h3 class="font-serif text-xl font-medium text-primary group-hover:text-accent transition-colors">${spec.title}</h3>
+                        <p class="text-xs text-dark/70 leading-relaxed font-light">${spec.desc}</p>
+                    </div>
+                    <div class="pt-4 flex items-center justify-end">
+                        <span class="text-[10px] uppercase tracking-widest font-bold text-accent group-hover:text-primary flex items-center gap-1">
+                            Select <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                        </span>
+                    </div>
+                </div>
+            `;
+        });
+
+        // --- JOURNEY TIMELINE ---
+        let selectedJourney = 4;
+        function updateTimeline() {
+            const nav = document.getElementById('timeline-nav');
+            nav.innerHTML = JOURNEY.map((item, index) => `
+                <button onclick="setTimeline(${index})" class="flex flex-col items-center text-center group focus:outline-none">
+                    <span class="text-xs uppercase tracking-widest font-bold mb-3 transition-colors ${selectedJourney === index ? 'text-accent' : 'text-dark/50'}">Year ${item.year}</span>
+                    <span class="w-4 h-4 rounded-full border-2 transition-all duration-300 ${selectedJourney === index ? 'bg-accent border-primary scale-125 shadow-md' : 'bg-white border-light group-hover:border-accent'}"></span>
+                    <span class="text-xs font-semibold text-primary mt-3 block">${item.role}</span>
+                </button>
+            `).join('');
+
+            const active = JOURNEY[selectedJourney];
+            document.getElementById('timeline-bg-year').innerText = active.year;
+            document.getElementById('timeline-year').innerText = active.year;
+            document.getElementById('timeline-role').innerText = active.role;
+            document.getElementById('timeline-inst').innerText = active.institution;
+            document.getElementById('timeline-desc').innerText = active.desc;
+
+            // Retrigger animation
+            const content = document.getElementById('timeline-content');
+            content.classList.remove('animate-fadeIn');
+            void content.offsetWidth;
+            content.classList.add('animate-fadeIn');
+        }
+        window.setTimeline = (index) => {
+            selectedJourney = index;
+            updateTimeline();
+        }
+        updateTimeline();
+
+        // --- RESEARCH FILTER ---
+        let selectedCat = 'All';
+        const searchInput = document.getElementById('research-search');
+        
+        function updateResearch() {
+            const query = searchInput.value.toLowerCase();
+            const grid = document.getElementById('research-grid');
+            const cats = ['All', 'Research Paper', 'Clinical Study', 'Review'];
+            
+            document.getElementById('research-filters').innerHTML = cats.map(cat => `
+                <button onclick="setResearchCat('${cat}')" class="px-3 py-1.5 text-[9px] font-bold tracking-widest uppercase transition-all ${selectedCat === cat ? 'bg-primary text-accent' : 'bg-base text-dark hover:bg-light'}">${cat}</button>
+            `).join('');
+
+            const filtered = PUBLICATIONS.filter(pub => {
+                const matchQ = pub.title.toLowerCase().includes(query) || pub.summary.toLowerCase().includes(query);
+                const matchC = selectedCat === 'All' || pub.category === selectedCat;
+                return matchQ && matchC;
+            });
+
+            if (filtered.length > 0) {
+                grid.innerHTML = filtered.map(pub => `
+                    <div class="bg-base p-8 border border-light flex flex-col justify-between min-h-[350px] hover:shadow-md transition-all relative group">
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center text-[10px] text-dark/50 tracking-wider uppercase font-semibold">
+                                <span>${pub.year} • ${pub.category}</span>
+                                <span class="text-accent font-serif">${pub.journal}</span>
+                            </div>
+                            <h3 class="font-serif text-xl font-medium text-primary tracking-tight group-hover:text-accent transition-colors leading-snug">${pub.title}</h3>
+                            <p class="text-xs text-dark/75 leading-relaxed font-light italic border-l border-accent pl-3 py-1">"${pub.summary}"</p>
+                        </div>
+                        <div class="pt-6 border-t border-light mt-6 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2">
+                            <button onclick="copyCitation('${pub.citation.replace(/'/g, "\\'")}', this)" class="text-[9px] uppercase tracking-widest font-bold text-primary hover:text-accent flex items-center gap-1">
+                                <i data-lucide="copy" class="w-3 h-3"></i> <span class="copy-text">Copy Citation</span>
+                            </button>
+                            <button onclick="openBookingWithReason('Research Collaboration', 'Hello Dr. Elena, I am interested in discussing your research: \\'${pub.title.replace(/'/g, "\\'")}\\'. Could you provide the PDF fulltext?')" class="text-[9px] uppercase tracking-widest font-bold text-accent hover:text-primary flex items-center gap-1.5">
+                                Request PDF <i data-lucide="arrow-right" class="w-2.5 h-2.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            } else {
+                grid.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-12 border border-light bg-base"><p class="text-dark/60 text-sm">No publication items match your criteria.</p></div>`;
+            }
+        }
+        window.setResearchCat = (cat) => { selectedCat = cat; updateResearch(); }
+        window.resetResearchFilters = () => { selectedCat = 'All'; searchInput.value = ''; updateResearch(); }
+        searchInput.addEventListener('input', updateResearch);
+        updateResearch();
+
+        window.copyCitation = (citation, btn) => {
+            const el = document.createElement('textarea');
+            el.value = citation;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            
+            const span = btn.querySelector('.copy-text');
+            const icon = btn.querySelector('i');
+            span.innerText = "✓ Copied (APA)";
+            icon.style.display = 'none';
+            setTimeout(() => { span.innerText = "Copy Citation"; icon.style.display = 'block'; }, 2000);
+        }
+
+        // --- SPEAKING CAROUSEL ---
+        let spkIdx = 0;
+        function updateSpk() {
+            const ev = EVENTS[spkIdx];
+            const content = document.getElementById('spk-content');
+            content.style.opacity = 0;
+            setTimeout(() => {
+                document.getElementById('spk-img').src = ev.image;
+                document.getElementById('spk-date').innerText = ev.date;
+                document.getElementById('spk-title').innerText = ev.title;
+                document.getElementById('spk-desc').innerText = ev.desc;
+                document.getElementById('spk-counter').innerText = `${spkIdx + 1} / ${EVENTS.length}`;
+                content.style.opacity = 1;
+            }, 200);
+        }
+        window.nextSpeaking = () => { spkIdx = (spkIdx + 1) % EVENTS.length; updateSpk(); }
+        window.prevSpeaking = () => { spkIdx = (spkIdx - 1 + EVENTS.length) % EVENTS.length; updateSpk(); }
+        updateSpk();
+
+        // --- AI CHAT ASSISTANT ---
+        const aiChat = [{ role: 'assistant', text: "Hello, I am Dr. Elena Marie Vella's digital assistant. You can ask about trauma therapy specializations, burnout management, research publications, or how to book a consultation schedule in London." }];
+        const chatBox = document.getElementById('chat-box');
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+
+        function renderChat() {
+            chatBox.innerHTML = aiChat.map(msg => `
+                <div class="max-w-[85%] p-3 leading-relaxed ${msg.role === 'assistant' ? 'bg-white text-dark border border-light mr-auto' : 'bg-primary text-white ml-auto'}">
+                    ${msg.text}
+                </div>
+            `).join('');
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (!text) return;
+            
+            aiChat.push({ role: 'user', text });
+            chatInput.value = '';
+            renderChat();
+
+            const loadingHTML = `
+                <div id="ai-loading" class="bg-white text-dark border border-light p-3 mr-auto flex items-center gap-1.5 animate-pulse">
+                    <span class="w-1 h-1 bg-accent rounded-full animate-bounce"></span>
+                    <span class="w-1 h-1 bg-accent rounded-full animate-bounce delay-100"></span>
+                    <span class="w-1 h-1 bg-accent rounded-full animate-bounce delay-200"></span>
+                    <span class="text-[10px] text-dark/60 font-semibold">Formulating response...</span>
+                </div>
+            `;
+            chatBox.insertAdjacentHTML('beforeend', loadingHTML);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            setTimeout(() => {
+                document.getElementById('ai-loading').remove();
+                let reply = "";
+                const lower = text.toLowerCase();
+                if (lower.includes('trauma') || lower.includes('ptsd')) reply = "Dr. Elena combines autonomic nervous system science with somatic trauma recovery. We provide structured 90-minute trauma assessment sessions.";
+                else if (lower.includes('burnout') || lower.includes('stress')) reply = "Executive burnout therapy focuses on prefrontal cortex recovery, setting healthy boundaries, and regulating circadian work rhythms.";
+                else if (lower.includes('fee') || lower.includes('cost')) reply = "Fees vary. Initial comprehensive assessments can be claimed through premium insurance like Bupa, AXA, and Allianz.";
+                else if (lower.includes('appointment') || lower.includes('book')) reply = "You can fill out the registration form in the 'Booking Portal' to schedule a direct session.";
+                else reply = "Thank you for your message. Dr. Elena's practice in Harley Street, London focuses on anxiety, PTSD, and mental fatigue. Are there any specific symptoms you'd like to discuss?";
+                
+                aiChat.push({ role: 'assistant', text: reply });
+                renderChat();
+            }, 800);
+        });
+        renderChat();
+
+        // --- TESTIMONIALS ---
+        let tIdx = 0;
+        function updateTestimonial() {
+            const t = TESTIMONIALS[tIdx];
+            const quoteEl = document.getElementById('testi-quote');
+            quoteEl.style.opacity = 0;
+            
+            document.getElementById('testi-nav').innerHTML = TESTIMONIALS.map((_, i) => `
+                <button onclick="setTesti(${i})" class="h-[3px] transition-all duration-500 rounded-none ${tIdx === i ? 'w-10 bg-accent' : 'w-3 bg-dark/20 hover:bg-dark/40'}"></button>
+            `).join('');
+
+            setTimeout(() => {
+                quoteEl.innerText = t.quote;
+                document.getElementById('testi-author').innerText = t.author;
+                document.getElementById('testi-role').innerText = t.role;
+                quoteEl.style.opacity = 1;
+            }, 300);
+        }
+        window.setTesti = (i) => { tIdx = i; updateTestimonial(); }
+        setInterval(() => { tIdx = (tIdx + 1) % TESTIMONIALS.length; updateTestimonial(); }, 8000);
+        updateTestimonial();
+
+        // Initialize Icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
